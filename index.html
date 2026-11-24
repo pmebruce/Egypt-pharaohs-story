@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>古埃及史：法老與時代（約 3150 BCE — 30 BCE）</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+  <style>
+    :root {
+      --bg-paper: #FAF6EE;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #F3ECE0;
+      --navy-deep: #15294A;
+      --navy-mid: #1E3A63;
+      --gold-warm: #C5963B;
+      --gold-light: #E8D5A7;
+      --terracotta: #A63A2B;
+      --ink-main: #1F2937;
+      --ink-muted: #57606F;
+      --border-soft: #E5DCCB;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-paper);
+      color: var(--ink-main);
+      font-family: "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      padding-bottom: 84px;
+    }
+
+    .font-serif-display {
+      font-family: "Noto Serif TC", "Georgia", "PMingLiU", serif;
+    }
+
+    .card-museum {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 2px 10px rgba(21, 41, 74, 0.04);
+    }
+
+    .era-tab {
+      transition: all 0.18s ease;
+    }
+
+    .era-tab.active {
+      background-color: var(--gold-warm);
+      color: #FFFFFF;
+      border-color: var(--gold-warm);
+      box-shadow: 0 2px 8px rgba(197, 150, 59, 0.35);
+    }
+
+    .era-tab:not(.active):hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .theme-pill {
+      transition: all 0.15s ease;
+    }
+
+    .theme-pill.active {
+      background-color: var(--navy-deep);
+      color: #FFFFFF;
+      border-color: var(--navy-deep);
+    }
+
+    input[type="range"].timeline-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: #E2D7C3;
+      outline: none;
+    }
+
+    input[type="range"].timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gold-warm);
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 1px 6px rgba(21, 41, 74, 0.35);
+      cursor: pointer;
+    }
+
+    input[type="range"].timeline-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gold-warm);
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 1px 6px rgba(21, 41, 74, 0.35);
+      cursor: pointer;
+    }
+
+    .watermark-num {
+      font-family: "Noto Serif TC", Georgia, serif;
+      color: rgba(197, 150, 59, 0.18);
+      line-height: 0.9;
+      user-select: none;
+    }
+
+    .map-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(21, 41, 74, 0.94);
+      color: #FFFFFF;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 20;
+      max-width: 210px;
+    }
+
+    .spark-dot {
+      cursor: pointer;
+      transition: r 0.15s ease;
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- Header & Era Navigation -->
+  <header class="bg-[#15294A] text-white border-b-4 border-[#C5963B]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-lg bg-[#C5963B] text-[#15294A] font-serif-display font-bold text-lg flex items-center justify-center shadow-sm tracking-tight shrink-0">
+            EG
+          </div>
+          <div>
+            <div class="flex flex-wrap items-baseline gap-2">
+              <h1 class="font-serif-display text-xl sm:text-2xl font-bold tracking-wide text-white">
+                古埃及史：法老與時代
+              </h1>
+              <span class="text-xs px-2 py-0.5 rounded bg-white/10 text-[#E8D5A7] border border-white/15">
+                約 3150 BCE — 30 BCE
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">
+              從上下埃及統一，到托勒密王朝的最後落幕
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-jump-timeline" type="button" class="text-xs sm:text-sm px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-slate-100 border border-white/15 transition">
+            時間軸
+          </button>
+          <button id="btn-jump-themes" type="button" class="text-xs sm:text-sm px-3 py-1.5 rounded-md bg-[#C5963B] hover:bg-[#B3852E] text-white font-medium transition shadow-sm">
+            主題脈絡
+          </button>
+        </div>
+      </div>
+
+      <!-- Balanced 4x2 Era Tabs -->
+      <nav aria-label="歷史時期導覽" id="era-tabs" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></nav>
+    </div>
+  </header>
+
+  <!-- Selector Bar -->
+  <div class="bg-[#F3ECE0] border-b border-[#E5DCCB] sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 flex-1 min-w-[220px]">
+        <label for="pharaoh-select" class="text-xs font-semibold uppercase tracking-wider text-[#57606F] shrink-0">
+          人物與任期
+        </label>
+        <select id="pharaoh-select" class="flex-1 max-w-md bg-white border border-[#D8CCB8] rounded-md px-3 py-1.5 text-sm text-[#1F2937] font-medium focus:outline-none focus:ring-2 focus:ring-[#C5963B]"></select>
+      </div>
+      <div class="flex items-center gap-3 text-xs sm:text-sm">
+        <span class="hidden sm:inline text-[#57606F]">鍵盤 <kbd class="px-1.5 py-0.5 bg-white border border-[#D8CCB8] rounded text-[11px]">←</kbd> <kbd class="px-1.5 py-0.5 bg-white border border-[#D8CCB8] rounded text-[11px]">→</kbd> 切換</span>
+        <span id="scene-counter" class="font-mono font-bold text-[#15294A] bg-white px-2.5 py-1 rounded border border-[#D8CCB8]">
+          01 / 17
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Stage -->
+  <main id="main-stage" class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+
+    <!-- Pharaoh Title Banner -->
+    <section class="card-museum rounded-xl p-5 sm:p-7 relative overflow-hidden">
+      <div id="watermark-number" class="watermark-num text-7xl sm:text-8xl font-bold absolute right-5 top-2 pointer-events-none">
+        序
+      </div>
+      <div class="relative z-10 max-w-3xl">
+        <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm mb-2">
+          <span id="stage-era-badge" class="px-2.5 py-0.5 rounded-full bg-[#15294A] text-white font-medium"></span>
+          <span id="stage-dynasty-badge" class="px-2.5 py-0.5 rounded-full bg-[#F3ECE0] text-[#7A5415] border border-[#E2D3B3] font-medium"></span>
+          <span id="stage-years" class="font-mono font-semibold text-[#A63A2B]"></span>
+        </div>
+        <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-[#15294A] tracking-tight">
+          <span id="stage-name-zh"></span>
+          <span id="stage-name-en" class="text-lg sm:text-2xl font-normal text-[#57606F] ml-2"></span>
+        </h2>
+        <p id="stage-epithet" class="text-sm sm:text-base text-[#57606F] mt-1.5"></p>
+      </div>
+    </section>
+
+    <!-- Dual Column Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- Left Column: Visual, Map & Data -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- Archival Illustration Plate -->
+        <section class="card-museum rounded-xl overflow-hidden">
+          <div class="relative bg-[#EDE5D5] aspect-[4/3] overflow-hidden group cursor-pointer" id="plate-container" role="button" tabindex="0" aria-label="放大檢視歷史插畫">
+            <img id="stage-plate-img" src="" alt="" class="w-full h-full object-cover transition duration-300 group-hover:scale-[1.02]" />
+            <div class="absolute bottom-2.5 right-2.5 bg-[#15294A]/85 text-white text-xs px-2.5 py-1 rounded-md backdrop-blur-sm">
+              點擊放大檢視
+            </div>
+          </div>
+          <div class="p-4 bg-[#FCF9F3] border-t border-[#E5DCCB]">
+            <p id="stage-plate-caption" class="text-xs sm:text-sm text-[#374151] leading-relaxed"></p>
+            <p class="text-[11px] text-[#6B7280] mt-1">
+              典藏風格歷史意象圖版（依該時期代表遺址與建築特徵繪製）
+            </p>
+          </div>
+        </section>
+
+        <!-- Interactive Egypt Territory & Sites Map -->
+        <section class="card-museum rounded-xl p-4 sm:p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h3 class="font-serif-display text-base font-bold text-[#15294A]">
+                這一任的埃及疆域與重心
+              </h3>
+              <p id="map-subtitle" class="text-xs text-[#57606F] mt-0.5"></p>
+            </div>
+            <div class="inline-flex rounded-md border border-[#D8CCB8] bg-[#F3ECE0] p-0.5 text-xs">
+              <button id="btn-map-start" type="button" class="px-2.5 py-1 rounded font-medium transition">
+                任初
+              </button>
+              <button id="btn-map-peak" type="button" class="px-2.5 py-1 rounded font-medium transition">
+                極盛／任末
+              </button>
+            </div>
+          </div>
+
+          <div id="egypt-map-wrap" class="relative w-full h-[320px] rounded-lg overflow-hidden bg-[#DCE8F2] border border-[#D8CCB8]">
+            <svg id="egypt-map-svg" class="w-full h-full block"></svg>
+            <div id="map-tooltip" class="map-tooltip"></div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#57606F]">
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-[#D9B464] border border-[#9E7524] inline-block"></span>核心統治區
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-[#E5C9A8] border border-[#A63A2B] inline-block"></span>勢力／遠征範圍
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#A63A2B] inline-block"></span>都城與關鍵地點
+              </span>
+            </div>
+            <span class="text-[10px] text-[#6B7280]">底圖：Natural Earth</span>
+          </div>
+          <p id="map-note" class="mt-2.5 text-xs text-[#374151] bg-[#FAF6EE] border border-[#E5DCCB] rounded-md px-3 py-2 leading-relaxed"></p>
+        </section>
+
+        <!-- Data & Sparkline Card -->
+        <section class="card-museum rounded-xl p-4 sm:p-5 space-y-4">
+          <h3 class="font-serif-display text-base font-bold text-[#15294A]">
+            任期數據與三千年縱軸
+          </h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-[#FAF6EE] border border-[#E5DCCB] rounded-lg p-3">
+              <div class="text-[11px] text-[#57606F]">政治中樞（都城）</div>
+              <div id="stat-capital" class="text-sm font-bold text-[#15294A] mt-0.5"></div>
+            </div>
+            <div class="bg-[#FAF6EE] border border-[#E5DCCB] rounded-lg p-3">
+              <div class="text-[11px] text-[#57606F]">估計在位年數</div>
+              <div id="stat-duration" class="text-sm font-bold text-[#A63A2B] mt-0.5"></div>
+            </div>
+          </div>
+
+          <!-- Reign Length Sparkline -->
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-medium text-[#374151]">17 幕代表法老在位年數比較</span>
+              <span id="spark-reign-label" class="font-mono text-[#A63A2B] font-semibold"></span>
+            </div>
+            <div class="bg-[#FCF9F3] border border-[#E5DCCB] rounded-lg p-2">
+              <svg id="sparkline-reign" class="w-full h-16 block" viewBox="0 0 360 64" preserveAspectRatio="none"></svg>
+            </div>
+          </div>
+
+          <!-- Era Position Sparkline -->
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-medium text-[#374151]">在古埃及三千年縱軸上的位置</span>
+              <span id="spark-year-label" class="font-mono text-[#15294A] font-semibold"></span>
+            </div>
+            <div class="bg-[#FCF9F3] border border-[#E5DCCB] rounded-lg p-2">
+              <svg id="sparkline-era" class="w-full h-14 block" viewBox="0 0 360 56" preserveAspectRatio="none"></svg>
+            </div>
+            <p class="text-[11px] text-[#6B7280] mt-1">
+              點擊折線圖上的任意圓點，可直接跳轉至對應法老。
+            </p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Narrative & Primary Sources -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Historical Turning Point & Theme Tags -->
+        <section class="card-museum rounded-xl p-5 sm:p-6 border-l-4 border-l-[#C5963B]">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#9E7524] mb-1.5">
+            這一任的歷史轉折
+          </div>
+          <p id="stage-turning-point" class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A] leading-snug"></p>
+          <div id="stage-theme-tags" class="flex flex-wrap gap-2 mt-3.5"></div>
+        </section>
+
+        <!-- 3-Part Structured Narrative -->
+        <section class="card-museum rounded-xl p-5 sm:p-6 space-y-5">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#15294A] text-white">01</span>
+              <h3 class="font-serif-display text-base sm:text-lg font-bold text-[#15294A]">接下什麼局面</h3>
+            </div>
+            <p id="narrative-inherited" class="text-sm sm:text-[15px] text-[#374151] leading-relaxed"></p>
+          </div>
+
+          <div class="pt-4 border-t border-[#EFE7D8]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#C5963B] text-white">02</span>
+              <h3 class="font-serif-display text-base sm:text-lg font-bold text-[#15294A]">做了什麼選擇</h3>
+            </div>
+            <p id="narrative-choices" class="text-sm sm:text-[15px] text-[#374151] leading-relaxed"></p>
+          </div>
+
+          <div class="pt-4 border-t border-[#EFE7D8]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#A63A2B] text-white">03</span>
+              <h3 class="font-serif-display text-base sm:text-lg font-bold text-[#15294A]">留下什麼影響</h3>
+            </div>
+            <p id="narrative-legacy" class="text-sm sm:text-[15px] text-[#374151] leading-relaxed"></p>
+          </div>
+        </section>
+
+        <!-- Primary Inscription / Source Quote -->
+        <section class="card-museum rounded-xl p-5 sm:p-6 bg-[#FCF9F3]">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <h3 class="font-serif-display text-base font-bold text-[#15294A]">
+              碑銘與歷史文獻摘句
+            </h3>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-[#F3ECE0] text-[#7A5415] border border-[#E2D3B3]">
+              本站編譯
+            </span>
+          </div>
+          <blockquote id="quote-zh" class="font-serif-display text-base sm:text-lg text-[#1F2937] leading-relaxed pl-3.5 border-l-3 border-[#C5963B]" style="border-left-width: 3px;"></blockquote>
+          <p id="quote-en" class="text-xs sm:text-sm text-[#57606F] italic mt-2.5 leading-relaxed"></p>
+          <div class="mt-3 text-xs text-[#57606F] flex flex-wrap items-center justify-between gap-2">
+            <span id="quote-source-title"></span>
+            <a id="quote-source-link" href="#" target="_blank" rel="noopener noreferrer" class="text-[#15294A] underline hover:text-[#A63A2B] font-medium">
+              檢視參考文獻 ↗
+            </a>
+          </div>
+        </section>
+
+        <!-- 3 Key Milestones -->
+        <section class="card-museum rounded-xl p-5 sm:p-6">
+          <h3 class="font-serif-display text-base font-bold text-[#15294A] mb-3.5">
+            三個關鍵時間節點
+          </h3>
+          <div id="stage-milestones" class="space-y-3"></div>
+        </section>
+
+        <!-- Further Reading -->
+        <section class="card-museum rounded-xl p-5 sm:p-6">
+          <h3 class="font-serif-display text-base font-bold text-[#15294A] mb-3">
+            史料與延伸閱讀
+          </h3>
+          <div id="stage-links" class="flex flex-wrap gap-2.5"></div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Historical Timeline Section -->
+    <section id="timeline-section" class="card-museum rounded-xl p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div>
+          <h3 class="font-serif-display text-lg font-bold text-[#15294A]">歷史時間軸（約 3150 BCE — 30 BCE）</h3>
+          <p class="text-xs text-[#57606F] mt-0.5">點擊下方時期色帶或拖曳滑桿，快速跨越三千年王朝更迭</p>
+        </div>
+        <span id="timeline-active-label" class="text-xs sm:text-sm font-semibold text-[#A63A2B] bg-[#FAF6EE] px-3 py-1 rounded-full border border-[#E5DCCB]"></span>
+      </div>
+
+      <!-- Era Color Ribbon -->
+      <div id="timeline-ribbon" class="flex w-full h-8 rounded-lg overflow-hidden border border-[#D8CCB8] mb-3"></div>
+
+      <!-- Legend for Eras -->
+      <div id="timeline-legend" class="flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-[#57606F] mb-4"></div>
+
+      <!-- Slider -->
+      <div class="space-y-2">
+        <input id="timeline-slider" type="range" min="0" max="16" value="0" class="w-full timeline-slider" aria-label="時間軸滑桿" />
+        <div class="flex justify-between text-[11px] font-mono text-[#57606F]">
+          <span>約 3150 BCE（那爾邁）</span>
+          <span>約 1479 BCE（新王國巔峰）</span>
+          <span>30 BCE（克麗奧佩脫拉七世）</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Thematic Context Section -->
+    <section id="thematic-section" class="card-museum rounded-xl p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h3 class="font-serif-display text-lg font-bold text-[#15294A]">主題脈絡篩選</h3>
+          <p class="text-xs text-[#57606F] mt-0.5">依歷史主線跨王朝串聯閱讀，觀察制度、信仰與帝國疆域的演變</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-theme-prev" type="button" class="text-xs px-3 py-1.5 rounded-md border border-[#D8CCB8] bg-[#FAF6EE] hover:bg-[#EFE6D5] text-[#15294A] font-medium transition">
+            ‹ 同主題上一幕
+          </button>
+          <button id="btn-theme-next" type="button" class="text-xs px-3 py-1.5 rounded-md border border-[#D8CCB8] bg-[#FAF6EE] hover:bg-[#EFE6D5] text-[#15294A] font-medium transition">
+            同主題下一幕 ›
+          </button>
+        </div>
+      </div>
+
+      <!-- Theme Filter Pills -->
+      <div id="theme-filter-bar" class="flex flex-wrap gap-2 mb-5"></div>
+
+      <!-- Matching Pharaoh Cards -->
+      <div id="theme-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-xs text-[#57606F] pt-2 pb-6 border-t border-[#E5DCCB] space-y-1.5 leading-relaxed">
+      <p>
+        <strong>年表說明：</strong>古埃及早王朝、古王國與中王國的絕對紀年學界存在些微差異，本站採用大英百科全書（Britannica）、紐約大都會藝術博物館（Met Museum）與 World History Encyclopedia 通行之主流埃及學紀年範圍，共收錄 8 大時期、17 幕代表性法老。
+      </p>
+      <p>
+        <strong>地圖與圖版：</strong>互動向量地圖採用 Natural Earth（world-atlas TopoJSON）與實測考古遺址經緯度繪製；時代意象插畫為本站專屬典藏風格圖版，內嵌載入以避免外部圖床延遲。
+      </p>
+    </footer>
+  </main>
+
+  <!-- Sticky Bottom Playback Control Bar -->
+  <div class="fixed bottom-0 inset-x-0 z-40 bg-[#15294A]/95 backdrop-blur-md border-t border-[#C5963B]/60 text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <button id="btn-prev" type="button" class="w-9 h-9 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-lg font-bold transition" aria-label="上一幕">
+          ‹
+        </button>
+        <button id="btn-play" type="button" class="px-4 h-9 rounded-md bg-[#C5963B] hover:bg-[#B3852E] text-white text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+          <span id="play-icon">▶</span>
+          <span id="play-label">播放</span>
+        </button>
+        <button id="btn-next" type="button" class="w-9 h-9 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-lg font-bold transition" aria-label="下一幕">
+          ›
+        </button>
+      </div>
+
+      <div class="hidden md:flex items-center gap-2 text-xs text-slate-200 truncate">
+        <span id="bar-current-title" class="font-medium truncate"></span>
+        <span id="bar-status-msg" class="text-[#E8D5A7]"></span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label for="playback-speed" class="text-xs text-slate-300 hidden sm:inline">模式</label>
+        <select id="playback-speed" class="bg-[#1E3A63] border border-white/20 rounded-md px-2.5 py-1.5 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#C5963B]">
+          <option value="1">1× 語音朗讀</option>
+          <option value="2">2× 自動瀏覽（8秒）</option>
+          <option value="5">5× 快速導覽（4秒）</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/85 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="歷史插畫放大檢視">
+    <div class="max-w-4xl w-full bg-[#FAF6EE] rounded-xl overflow-hidden shadow-2xl border border-[#C5963B]">
+      <div class="flex items-center justify-between px-4 py-3 bg-[#15294A] text-white">
+        <div id="lightbox-title" class="font-serif-display font-bold text-sm sm:text-base"></div>
+        <button id="btn-close-lightbox" type="button" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs sm:text-sm">
+          關閉 ✕
+        </button>
+      </div>
+      <div class="bg-[#111827] flex items-center justify-center max-h-[70vh] overflow-hidden">
+        <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[70vh] object-contain" />
+      </div>
+      <div class="p-4 bg-[#FAF6EE] text-xs sm:text-sm text-[#374151] leading-relaxed" id="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <script>
+    // Verified Archaeological & Historical Site Coordinates [lng, lat]
+    const SITES = {
+      delta:     { name: '尼羅河三角洲／亞歷山卓與塞易斯帶', short: '三角洲', coords: [31.2167, 30.0333], desc: '下埃及富饒沖積平原與地中海門戶' },
+      giza:      { name: '吉薩（Giza）', short: '吉薩', coords: [31.1304, 29.9760], desc: '古王國第四王朝大金字塔群所在' },
+      memphis:   { name: '孟菲斯與薩卡拉（Memphis & Saqqara）', short: '孟菲斯', coords: [31.2611, 29.8555], desc: '上下埃及交界古都與階梯金字塔墓區' },
+      amarna:    { name: '阿瑪納（Amarna／阿赫塔頓）', short: '阿瑪納', coords: [30.8964, 27.6453], desc: '阿肯那頓為太陽神阿頓興建的新都' },
+      abydos:    { name: '阿拜多斯（Abydos）', short: '阿拜多斯', coords: [31.7000, 26.1000], desc: '早王朝王陵與歐西里斯信仰聖地' },
+      thebes:    { name: '底比斯／路克索（Thebes／Luxor）', short: '底比斯', coords: [32.6421, 25.6989], desc: '中王國與新王國宗教政治中心、卡納克神廟與帝王谷' },
+      abusimbel: { name: '阿布辛貝／下努比亞（Abu Simbel）', short: '阿布辛貝', coords: [31.6256, 22.3369], desc: '拉美西斯二世巨型岩窟神廟與南方邊境門戶' },
+      napata:    { name: '納帕塔／巴爾卡爾山（Napata）', short: '納帕塔', coords: [31.8283, 18.5367], desc: '庫施王國聖山與第25王朝發源地' },
+      megiddo:   { name: '美吉多（Megiddo）', short: '美吉多', coords: [35.1848, 32.5846], desc: '黎凡特戰略要道，圖特摩斯三世經典勝仗之地' },
+      kadesh:    { name: '卡迭石（Kadesh）', short: '卡迭石', coords: [36.5200, 34.5576], desc: '敘利亞奧龍特斯河畔，拉美西斯二世與西臺決戰地' }
+    };
+
+    const ERAS = [
+      { id: 'era0', code: '序章', label: '上下埃及統一', span: '約 3150–2686 BCE', color: '#8C6239' },
+      { id: 'era1', code: '01',   label: '古王國與金字塔', span: '約 2686–2181 BCE', color: '#C5963B' },
+      { id: 'era2', code: '02',   label: '中王國文藝復興', span: '約 2055–1650 BCE', color: '#2F6F6D' },
+      { id: 'era3', code: '03',   label: '新王國與帝國擴張', span: '約 1550–1425 BCE', color: '#1E4E79' },
+      { id: 'era4', code: '04',   label: '阿瑪納宗教革命', span: '約 1353–1324 BCE', color: '#B85D19' },
+      { id: 'era5', code: '05',   label: '拉美西斯與海上民族', span: '約 1279–1155 BCE', color: '#A63A2B' },
+      { id: 'era6', code: '06',   label: '後期王朝與庫施復興', span: '約 744–610 BCE',   color: '#5B4B8A' },
+      { id: 'era7', code: '07',   label: '希臘化與法老終章', span: '332–30 BCE',       color: '#3A5A40' }
+    ];
+
+    const THEMES = [
+      { id: 'unification', label: '疆土統一與擴張' },
+      { id: 'monuments',   label: '神廟與紀念建築' },
+      { id: 'religion',    label: '宗教與意識形態' },
+      { id: 'diplomacy',   label: '外交與跨國貿易' },
+      { id: 'warfare',     label: '戰爭與邊境防衛' },
+      { id: 'succession',  label: '女權與王位繼承' },
+      { id: 'reform',      label: '中央集權與改革' },
+      { id: 'transition',  label: '外族交會與帝國轉型' }
+    ];
+
+    const PLATES = {
+      early: 'assets/early_narmer.jpg',
+      old: 'assets/old_giza.jpg',
+      middle: 'assets/middle_thebes.jpg',
+      newk: 'assets/new_karnak.jpg',
+      ramesses: 'assets/ramesses_abusimbel.jpg',
+      ptolemy: 'assets/ptolemy_alexandria.jpg'
+    };
+
+    const PHARAOHS = [
+      {
+        id: 'narmer',
+        numLabel: '序',
+        eraId: 'era0',
+        dynasty: '第一王朝',
+        nameZh: '那爾邁',
+        nameEn: 'Narmer',
+        epithet: '戴上紅白雙冠的統一者，開啟古埃及王朝紀元',
+        yearsText: '約 3150–3100 BCE',
+        startBce: 3150,
+        reignYears: 50,
+        capital: '孟菲斯（白城）',
+        plateImg: PLATES.early,
+        plateCaption: '早王朝時期尼羅河畔的石造神廟與蘆葦舟，見證上下埃及首度整合為統一王權。',
+        turningPoint: '將尼羅河谷的上埃及與三角洲的下埃及合而為一，確立延續三千年的雙冠王權與象形文字行政體系。',
+        themes: ['unification', 'religion', 'reform'],
+        inherited: '前王朝末期，尼羅河谷由上埃及（希拉孔波利斯一帶）與下埃及（三角洲地區）多個城邦與地方勢力分立，彼此透過河運貿易與軍事衝突爭奪主導權。',
+        choices: '那爾邁率領上埃及勢力北上統合三角洲，並在上下埃及交界處建立戰略據點孟菲斯，透過《那爾邁調色板》同時呈現紅冠與白冠，以宗教儀式與王權符號宣告南北一統。',
+        legacy: '奠定古埃及「兩地之主」的國家認同與中央行政雛形，並使早期象形文字正式成為紀錄王權、賦稅與歷史事件的工具。',
+        quoteZh: '「上下埃及之王那爾邁，頭戴白冠擊潰北境之敵，再戴紅冠巡視統一後的兩地。」',
+        quoteEn: 'Narmer, wearing the White Crown of Upper Egypt on one face and the Red Crown of Lower Egypt on the reverse of the Narmer Palette (c. 3100 BCE).',
+        quoteSource: '《那爾邁調色板》圖像銘文解析（開羅埃及博物館典藏）',
+        quoteUrl: 'https://www.worldhistory.org/egypt/',
+        milestones: [
+          { year: '約 3150 BCE', text: '統一上埃及與下埃及，結束前王朝時期並開啟第一王朝。' },
+          { year: '約 3120 BCE', text: '於南北交界處奠定孟菲斯行政重心，掌控尼羅河航運咽喉。' },
+          { year: '約 3100 BCE', text: '葬於阿拜多斯烏姆・卡伯王陵區，成為早王朝法老聖地傳統。' }
+        ],
+        links: [
+          { title: 'Britannica：Ancient Egypt', url: 'https://www.britannica.com/place/ancient-Egypt' },
+          { title: 'World History：Ancient Egypt', url: 'https://www.worldhistory.org/egypt/' }
+        ],
+        map: {
+          start: {
+            subtitle: '統一前夕・上埃及勢力北進',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['abydos', 'thebes'],
+            capitalSite: 'abydos',
+            arcs: [['abydos', 'memphis']],
+            note: '任初勢力集中於上埃及尼羅河谷（阿拜多斯與底比斯一帶），正準備向北推進整合三角洲。'
+          },
+          peak: {
+            subtitle: '統一完成・紅白雙冠兩地一統',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'memphis', 'abydos', 'thebes'],
+            capitalSite: 'memphis',
+            arcs: [['abydos', 'memphis'], ['memphis', 'delta']],
+            note: '完成上下埃及統一後，在三角洲頂端建立孟菲斯為統治中樞，貫通整條尼羅河谷。'
+          }
+        }
+      },
+      {
+        id: 'djoser',
+        numLabel: '02',
+        eraId: 'era1',
+        dynasty: '第三王朝',
+        nameZh: '左塞爾',
+        nameEn: 'Djoser',
+        epithet: '古王國揭幕者，與宰相印和闐共築史上首座石造金字塔',
+        yearsText: '約 2630–2611 BCE',
+        startBce: 2630,
+        reignYears: 19,
+        capital: '孟菲斯',
+        plateImg: PLATES.old,
+        plateCaption: '古王國時期於孟菲斯西岸沙漠高地拔地而起的石造金字塔建築群與祭道。',
+        turningPoint: '在建築師印和闐設計下，首度以全石材建造薩卡拉階梯金字塔，宣告古王國紀念建築時代來臨。',
+        themes: ['monuments', 'reform', 'religion'],
+        inherited: '早王朝時期王陵仍以泥磚馬斯塔巴（Mastaba）為主，且地方行政尚在磨合，王室正尋求更穩固的中央官僚與神權象徵。',
+        choices: '左塞爾重用博學宰相印和闐，將傳統泥磚陵墓向上堆疊為六層石灰岩階梯金字塔，並將各地原有的獨立聚落整合為由法老直轄的「州」（Nome）行政區。',
+        legacy: '徹底改寫人類大型石造建築史，也確立了古王國高度集權的孟菲斯宮廷體制與「神王」形象。',
+        quoteZh: '「下埃及之王財務官、大宮總管、赫利奧波利斯大祭司、雕塑家與建築師印和闐。」',
+        quoteEn: 'Inscription on the base of Djoser’s statue honoring his vizier and architect Imhotep at Saqqara.',
+        quoteSource: '左塞爾雕像底座銘文（薩卡拉階梯金字塔建築群）',
+        quoteUrl: 'https://whc.unesco.org/en/list/86/',
+        milestones: [
+          { year: '約 2630 BCE', text: '即位第三王朝，於孟菲斯建立穩固宮廷與中央行政。' },
+          { year: '約 2625 BCE', text: '委任印和闐於薩卡拉動工建造史上首座大型石造階梯金字塔。' },
+          { year: '約 2615 BCE', text: '開採西奈半島綠松石與銅礦，強化國家資源調度能力。' }
+        ],
+        links: [
+          { title: 'UNESCO：孟菲斯與金字塔墓區', url: 'https://whc.unesco.org/en/list/86/' },
+          { title: 'Wikipedia：History of Ancient Egypt', url: 'https://en.wikipedia.org/wiki/History_of_ancient_Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '第三王朝初期・孟菲斯集權起步',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['memphis', 'abydos'],
+            capitalSite: 'memphis',
+            arcs: [['abydos', 'memphis']],
+            note: '定都孟菲斯，將王室墓地從傳統阿拜多斯全面轉移至鄰近都城的薩卡拉高地。'
+          },
+          peak: {
+            subtitle: '薩卡拉工程落成・直轄各州體制確立',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'memphis', 'giza', 'thebes'],
+            capitalSite: 'memphis',
+            arcs: [['memphis', 'delta'], ['memphis', 'thebes']],
+            note: '以孟菲斯為核心調度全國人力與石材資源，並將採礦與貿易觸角延伸至西奈半島與南方邊境。'
+          }
+        }
+      },
+      {
+        id: 'khufu',
+        numLabel: '03',
+        eraId: 'era1',
+        dynasty: '第四王朝',
+        nameZh: '古夫',
+        nameEn: 'Khufu',
+        epithet: '吉薩大金字塔建造者，古王國國力與工程組織的最高峰',
+        yearsText: '約 2551–2528 BCE',
+        startBce: 2551,
+        reignYears: 23,
+        capital: '孟菲斯',
+        plateImg: PLATES.old,
+        plateCaption: '吉薩高原大金字塔與石灰岩祭道，展現第四王朝舉國動員的精密工程與測量能力。',
+        turningPoint: '建成古代世界七大奇蹟中唯一留存至今的吉薩大金字塔，展現無與倫比的國家糧食、物流與勞動力調度體系。',
+        themes: ['monuments', 'reform'],
+        inherited: '父親斯尼夫魯（Sneferu）已完成從階梯式到平滑面金字塔的技術演進（紅金字塔），留給古夫富足的國庫與成熟的石工團隊。',
+        choices: '古夫選定吉薩高地為永久王陵，調度尼羅河汎濫期農閒勞力與專業工匠，建立高度精細的後勤與港埠運輸系統，將石灰岩與亞斯文花崗岩精準組裝。',
+        legacy: '吉薩大金字塔成為古埃及文明最廣為人知的象徵，也反映出第四王朝中央集權達到史無前例的高度。',
+        quoteZh: '「梅勒日誌記錄著工隊自圖拉採石場裝載白色石灰岩，經運河運抵『古夫的地平線』工地。」',
+        quoteEn: 'The Diary of Merer (Wadi al-Jarf papyri) documents limestone shipments along the Nile canals to the Great Pyramid site, "Horizon of Khufu."',
+        quoteSource: '瓦迪阿爾賈夫紙草（梅勒日誌）與大金字塔考古研究',
+        quoteUrl: 'https://whc.unesco.org/en/list/86/',
+        milestones: [
+          { year: '約 2551 BCE', text: '繼承斯尼夫魯王位，啟動吉薩高原大型王陵規劃。' },
+          { year: '約 2540 BCE', text: '大規模動員圖拉採石場與紅海港埠補給線，興建大金字塔。' },
+          { year: '約 2528 BCE', text: '大金字塔與太陽船坑基本完工，奠定吉薩建築群格局。' }
+        ],
+        links: [
+          { title: 'UNESCO：吉薩至代赫舒爾金字塔群', url: 'https://whc.unesco.org/en/list/86/' },
+          { title: 'TheCollector：Essential Pharaohs', url: 'https://www.thecollector.com/essential-egyptian-pharaohs/' }
+        ],
+        map: {
+          start: {
+            subtitle: '第四王朝初年・延續孟菲斯與代赫舒爾工程',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['memphis', 'giza'],
+            capitalSite: 'memphis',
+            arcs: [['memphis', 'giza']],
+            note: '承接斯尼夫魯的建築經驗，將王陵工程重心向北推進至地基堅實的吉薩石灰岩高地。'
+          },
+          peak: {
+            subtitle: '吉薩大金字塔完工・全國水運後勤貫通',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'giza', 'memphis', 'thebes'],
+            capitalSite: 'memphis',
+            arcs: [['thebes', 'memphis'], ['memphis', 'giza'], ['delta', 'giza']],
+            note: '藉助尼羅河水運從南方運送花崗岩、從三角洲調度糧食，撐起古王國規模最大的國家工程。'
+          }
+        }
+      },
+      {
+        id: 'pepi2',
+        numLabel: '04',
+        eraId: 'era1',
+        dynasty: '第六王朝',
+        nameZh: '佩皮二世',
+        nameEn: 'Pepi II',
+        epithet: '極長任期的幼主法老，見證古王國由盛轉衰與地方州長崛起',
+        yearsText: '約 2216–2153 BCE',
+        startBce: 2216,
+        reignYears: 63,
+        capital: '孟菲斯',
+        plateImg: PLATES.old,
+        plateCaption: '第六王朝末期，王室金字塔規模大幅縮小，權力逐漸自孟菲斯流失至各州地方貴族。',
+        turningPoint: '超長統治後期因繼承人紛爭、氣候乾旱與地方州長（Nomarchs）世襲化，導致古王國中央體制瓦解。',
+        themes: ['reform', 'diplomacy'],
+        inherited: '佩皮二世年幼登基，初期由母后與外戚輔政；當時埃及仍維持對努比亞與遠方貿易（如象牙、烏木、香料）的派遺能力。',
+        choices: '為維繫國內穩定，王室持續授予地方州長免稅特權與世襲職位，雖短期換取效忠，卻使中央財政與對地方的控制力不斷被侵蝕。',
+        legacy: '佩皮二世過世後，王權迅速崩解並滑入長達百餘年的「第一中間期」，直到第十一王朝底比斯勢力才再度統一全國。',
+        quoteZh: '「陛下極為欣喜聽聞你自南方帶回一名會跳神舞的矮人，務必日夜守護他平安抵達宮廷。」',
+        quoteEn: 'Letter of young King Pepi II inscribed on the tomb of Harkhuf at Aswan, eagerly awaiting a dancing pygmy from Yam.',
+        quoteSource: '哈爾庫夫墓壁銘文（阿斯旺貴族墓群）',
+        quoteUrl: 'https://www.britannica.com/topic/list-of-pharaohs-of-ancient-Egypt',
+        milestones: [
+          { year: '約 2216 BCE', text: '年幼即位，早期展現對南方商旅與遠征隊的濃厚興趣。' },
+          { year: '約 2190 BCE', text: '地方州長（Nomarchs）權勢坐大，不再於孟菲斯陪葬而改葬各自領地。' },
+          { year: '約 2153 BCE', text: '超長任期結束，第六王朝隨之衰亡，古王國步入分裂。' }
+        ],
+        links: [
+          { title: 'Britannica：List of Pharaohs', url: 'https://www.britannica.com/topic/list-of-pharaohs-of-ancient-Egypt' },
+          { title: 'Wikipedia：History of Ancient Egypt', url: 'https://en.wikipedia.org/wiki/History_of_ancient_Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '第六王朝前期・遠征貿易尚能直通南方',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['memphis', 'abydos', 'thebes', 'abusimbel'],
+            capitalSite: 'memphis',
+            arcs: [['memphis', 'thebes'], ['thebes', 'abusimbel']],
+            note: '登基初期仍能派遣總督哈爾庫夫等人深入努比亞內陸進行長途貿易。'
+          },
+          peak: {
+            subtitle: '任末權力分散・中央威權退守孟菲斯周邊',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['memphis', 'abydos', 'thebes'],
+            capitalSite: 'memphis',
+            arcs: [['memphis', 'abydos']],
+            note: '任期末年各州州長形同割據，尼羅河低水位與饑荒更進一步動搖孟菲斯中央統治。'
+          }
+        }
+      },
+      {
+        id: 'mentuhotep2',
+        numLabel: '05',
+        eraId: 'era2',
+        dynasty: '第十一王朝',
+        nameZh: '門圖霍特普二世',
+        nameEn: 'Mentuhotep II',
+        epithet: '終結第一中間期的再統一者，奠定中王國與底比斯盛世',
+        yearsText: '約 2051–2000 BCE',
+        startBce: 2051,
+        reignYears: 51,
+        capital: '底比斯',
+        plateImg: PLATES.middle,
+        plateCaption: '底比斯西岸崖壁下的階梯列柱祭廟與尼羅河風光，標誌中王國的政治與藝術復興。',
+        turningPoint: '擊敗北方的赫拉克利奧波利斯政權，結束長達一世紀的內戰分裂，正式開啟「中王國時期」。',
+        themes: ['unification', 'monuments', 'warfare'],
+        inherited: '第一中間期埃及南北分裂，北方由第十王朝統治，南方底比斯的第十一王朝與之長期對峙，國家經濟與水利失修。',
+        choices: '門圖霍特普二世逐步向北推進並攻克北方政權，重整中央官僚、派軍鞏固邊防，並在底比斯西岸代爾埃爾巴哈里首創依山而建的階梯式柱廊祭廟。',
+        legacy: '使底比斯首度躍升為全國政治與宗教中心，其祭廟建築美學更成為五百年後哈特謝普蘇特神廟的直接靈感來源。',
+        quoteZh: '「上下埃及的再統一者，使兩地重歸和平與秩序（瑪阿特）的君主。」',
+        quoteEn: 'Mentuhotep II adopted the Horus name Sematawy — "He who unites the Two Lands" — celebrating Egypt’s reunification.',
+        quoteSource: '門圖霍特普二世荷魯斯王名「塞瑪塔維」（統一兩地者）',
+        quoteUrl: 'https://www.britannica.com/place/ancient-Egypt',
+        milestones: [
+          { year: '約 2051 BCE', text: '於底比斯繼位，展開對北方政權的長期軍事統合。' },
+          { year: '約 2040 BCE', text: '徹底統一上下埃及，改用荷魯斯王名「統一兩地者」，揭開中王國序幕。' },
+          { year: '約 2010 BCE', text: '完成代爾埃爾巴哈里階梯式陵廟，確立底比斯神聖地景。' }
+        ],
+        links: [
+          { title: 'Britannica：Ancient Egypt', url: 'https://www.britannica.com/place/ancient-Egypt' },
+          { title: 'Facts & Details：Rulers of Ancient Egypt', url: 'https://africame.factsanddetails.com/article/entry-99.html' }
+        ],
+        map: {
+          start: {
+            subtitle: '第一中間期末期・僅據上埃及底比斯',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['thebes', 'abydos'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'abydos']],
+            note: '即位初期統治範圍僅限南方上埃及，與北方赫拉克利奧波利斯王朝隔中埃及對峙。'
+          },
+          peak: {
+            subtitle: '全國再統一・底比斯成為中王國首府',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['delta', 'memphis', 'abydos', 'thebes', 'abusimbel'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'memphis'], ['memphis', 'delta'], ['thebes', 'abusimbel']],
+            note: '擊潰北方政權後重新統合全埃及，並將影響力重新伸入下努比亞與西奈礦區。'
+          }
+        }
+      },
+      {
+        id: 'senusret3',
+        numLabel: '06',
+        eraId: 'era2',
+        dynasty: '第十二王朝',
+        nameZh: '辛努塞爾特三世',
+        nameEn: 'Senusret III',
+        epithet: '中王國最強勢的戰士法老與中央集權改革者',
+        yearsText: '約 1878–1839 BCE',
+        startBce: 1878,
+        reignYears: 39,
+        capital: '伊蒂塔威（孟菲斯南區）',
+        plateImg: PLATES.middle,
+        plateCaption: '中王國時期俯瞰尼羅河航道的泥磚邊境要塞與神廟景觀，體現嚴密的南方防務。',
+        turningPoint: '徹底削弱地方世襲貴族權力，並沿尼羅河第二瀑布興建龐大泥磚要塞鏈，將埃及南界推進至下努比亞深處。',
+        themes: ['reform', 'warfare', 'unification'],
+        inherited: '第十二王朝雖已恢復繁榮，但地方州長家族仍握有龐大土地與私兵，且南方庫施（努比亞）勢力日漸崛起威脅金礦補給。',
+        choices: '辛努塞爾特三世重劃全國行政區為三大直轄部門，大幅壓縮世襲州長權勢；對外則數度親征努比亞，修築布亨（Buhen）等大型邊防堡壘並立界碑嚴格控管商旅。',
+        legacy: '使中王國步入權力與文學藝術的黃金年代，雕像也打破過往理想化面容，首度展現神情嚴峻、擔憂國事的寫實王權肖像。',
+        quoteZh: '「我已將邊界推得比祖先更遠；凡我子孫能守住這條邊界者，方為我真正的兒子。」',
+        quoteEn: 'Semna Boundary Stela of Senusret III: "I have made my boundary further south than my fathers... Now as for any son of mine who shall maintain this border, he is my son."',
+        quoteSource: '塞姆納邊界碑銘文（第十二王朝努比亞邊防遺跡）',
+        quoteUrl: 'https://en.wikipedia.org/wiki/History_of_ancient_Egypt',
+        milestones: [
+          { year: '約 1878 BCE', text: '即位第十二王朝，推動行政重組以終結地方州長割據隱患。' },
+          { year: '約 1870 BCE', text: '親率大軍南征努比亞，開鑿繞過第一瀑布的運河以利軍運。' },
+          { year: '約 1862 BCE', text: '於第二瀑布一帶築起塞姆納、布亨要塞群並立界碑固守南疆。' }
+        ],
+        links: [
+          { title: 'Wikipedia：History of Ancient Egypt', url: 'https://en.wikipedia.org/wiki/History_of_ancient_Egypt' },
+          { title: 'Britannica：List of Pharaohs', url: 'https://www.britannica.com/topic/list-of-pharaohs-of-ancient-Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '第十二王朝中葉・鞏固本土與第一瀑布線',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'memphis', 'abydos', 'thebes'],
+            capitalSite: 'memphis',
+            arcs: [['memphis', 'thebes']],
+            note: '自伊蒂塔威（孟菲斯以南）推行中央集權，整頓地方貴族與財政。'
+          },
+          peak: {
+            subtitle: '努比亞要塞鏈建成・南境推進至第二瀑布',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['memphis', 'abydos', 'thebes', 'abusimbel'],
+            capitalSite: 'memphis',
+            arcs: [['memphis', 'thebes'], ['thebes', 'abusimbel']],
+            note: '在努比亞建立一整套軍事要塞與海關檢查站，牢牢掌握南方黃金與貿易命脈。'
+          }
+        }
+      },
+      {
+        id: 'ahmose1',
+        numLabel: '07',
+        eraId: 'era3',
+        dynasty: '第十八王朝',
+        nameZh: '雅赫摩斯一世',
+        nameEn: 'Ahmose I',
+        epithet: '驅逐喜克索斯人的解放者，開啟新王國帝國紀元',
+        yearsText: '約 1550–1525 BCE',
+        startBce: 1550,
+        reignYears: 25,
+        capital: '底比斯',
+        plateImg: PLATES.newk,
+        plateCaption: '新王國時期底比斯神廟與莊嚴方尖碑建築群，象徵埃及擺脫外族統治後的全面復興。',
+        turningPoint: '攻陷外族喜克索斯人的都城阿瓦里斯並將其逐出埃及，結束第二中間期，奠定新王國對外主動防禦的帝國戰略。',
+        themes: ['warfare', 'unification', 'transition'],
+        inherited: '第二中間期三角洲為西亞外族「喜克索斯人」盤踞，南方則有庫施王國夾擊；父王塞格嫩拉與兄長卡摩斯皆在抗戰中相繼離世。',
+        choices: '雅赫摩斯一世吸收對手引進的馬拉戰車與複合弓等新式武器，水陸並進攻下三角洲重鎮阿瓦里斯，隨後越境追擊至迦南南部，並回師收復下努比亞建立緩衝區。',
+        legacy: '開啟古埃及歷史上國力最輝煌的「新王國時期」，埃及從過往相對孤立的尼羅河王國轉型為積極經營西亞與努比亞的區域帝國。',
+        quoteZh: '「我隨國王赴戰，當阿瓦里斯城破時，我斬獲戰功並獲法老賜予榮譽黃金。」',
+        quoteEn: 'Autobiography of Ahmose, son of Ibana, recording the capture of Avaris and the expulsion of the Hyksos under Ahmose I.',
+        quoteSource: '海軍軍官阿赫摩斯・伊巴納之子自傳墓銘（埃爾卡布）',
+        quoteUrl: 'https://www.worldhistory.org/Egyptian_Empire/',
+        milestones: [
+          { year: '約 1550 BCE', text: '繼承底比斯王位，創立第十八王朝。' },
+          { year: '約 1540 BCE', text: '攻陷喜克索斯都城阿瓦里斯，並追擊至迦南沙魯亨（Sharuhen）。' },
+          { year: '約 1530 BCE', text: '重整全國水利與神廟經濟，於阿拜多斯興建最後一座大型王室金字塔。' }
+        ],
+        links: [
+          { title: 'World History：Egyptian Empire', url: 'https://www.worldhistory.org/Egyptian_Empire/' },
+          { title: 'Wikipedia：New Kingdom of Egypt', url: 'https://en.wikipedia.org/wiki/New_Kingdom_of_Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '第二中間期末・底比斯偏安南方',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['thebes', 'abydos'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'delta']],
+            note: '即位時北方三角洲由喜克索斯人控制，底比斯僅掌握上埃及核心河谷。'
+          },
+          peak: {
+            subtitle: '驅逐喜克索斯・建立西亞與努比亞緩衝帶',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275'],
+            sites: ['delta', 'memphis', 'abydos', 'thebes', 'abusimbel'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'delta'], ['delta', 'megiddo'], ['thebes', 'abusimbel']],
+            note: '徹底收復三角洲並將防線外推至迦南邊境與努比亞，揭開新王國帝國時代。'
+          }
+        }
+      },
+      {
+        id: 'hatshepsut',
+        numLabel: '08',
+        eraId: 'era3',
+        dynasty: '第十八王朝',
+        nameZh: '哈特謝普蘇特',
+        nameEn: 'Hatshepsut',
+        epithet: '古埃及最具影響力的女法老，以和平貿易與建築傑作聞名',
+        yearsText: '約 1479–1458 BCE',
+        startBce: 1479,
+        reignYears: 21,
+        capital: '底比斯',
+        plateImg: PLATES.newk,
+        plateCaption: '卡納克神廟高聳的花崗岩方尖碑與層疊柱廊神廟，展現第十八王朝的建築工藝巔峰。',
+        turningPoint: '由攝政王后正式加冕為法老，以長途海上貿易與大規模神廟營造取代連年征戰，創造二十餘年繁榮盛世。',
+        themes: ['succession', 'diplomacy', 'monuments'],
+        inherited: '丈夫圖特摩斯二世早逝，繼位者圖特摩斯三世年幼，哈特謝普蘇特原以王后身分攝政，面臨宮廷權力與正統性的雙重考驗。',
+        choices: '她透過「阿蒙神聖誕生」神話與傳統法老服飾確立統治正統，派遣五艘遠洋大船出使紅海沿岸的「龐特之地」（Punt）帶回沒藥樹、乳香與黃金，並在代爾埃爾巴哈里建起驚艷後世的三層柱廊祭廟。',
+        legacy: '留給埃及充盈的國庫與無數建築瑰寶（包括卡納克巨型方尖碑）；雖在身後一度遭到刻意抹除王名，但其治國手腕至今備受史學界肯定。',
+        quoteZh: '「我使雙地繁榮，派遣船隊航向神聖的龐特之地，帶回芳香的沒藥樹栽種於阿蒙神的花園。」',
+        quoteEn: 'Relief inscriptions at Hatshepsut’s mortuary temple at Deir el-Bahari commemorating the maritime trade expedition to the Land of Punt.',
+        quoteSource: '代爾埃爾巴哈里祭廟《龐特遠征浮雕》銘文',
+        quoteUrl: 'https://www.britannica.com/topic/list-of-pharaohs-of-ancient-Egypt',
+        milestones: [
+          { year: '約 1479 BCE', text: '以攝政身分掌理國政，數年後正式採用完整法老頭銜共同執政。' },
+          { year: '約 1470 BCE', text: '派遣規模空前的紅海貿易艦隊抵達龐特之地，開啟跨海商貿佳話。' },
+          { year: '約 1460 BCE', text: '於卡納克神廟立起巨型花崗岩方尖碑，並完成代爾埃爾巴哈里祭廟。' }
+        ],
+        links: [
+          { title: 'Met Museum：List of Rulers', url: 'https://www.metmuseum.org/toah/hd/phar/hd_phar.htm' },
+          { title: 'TheCollector：Essential Pharaohs', url: 'https://www.thecollector.com/essential-egyptian-pharaohs/' }
+        ],
+        map: {
+          start: {
+            subtitle: '攝政初期・以底比斯與卡納克為核心',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['memphis', 'thebes', 'abusimbel'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'memphis']],
+            note: '穩固底比斯阿蒙祭司團支持，修復喜克索斯時期受損的各地神廟。'
+          },
+          peak: {
+            subtitle: '紅海貿易盛世・商路通達龐特與黎凡特',
+            countries: ['818'],
+            influenceCountries: ['729', '682', '376', '275'],
+            sites: ['delta', 'memphis', 'thebes', 'abusimbel'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'abusimbel'], ['thebes', 'delta']],
+            note: '以和平外交與海上貿易為主軸，將香料、沒藥、烏木與珍寶源源不絕匯聚底比斯。'
+          }
+        }
+      },
+      {
+        id: 'thutmose3',
+        numLabel: '09',
+        eraId: 'era3',
+        dynasty: '第十八王朝',
+        nameZh: '圖特摩斯三世',
+        nameEn: 'Thutmose III',
+        epithet: '被譽為「古埃及的拿破崙」，締造古埃及歷史最大疆域',
+        yearsText: '約 1479–1425 BCE',
+        startBce: 1479,
+        reignYears: 54,
+        capital: '底比斯',
+        plateImg: PLATES.newk,
+        plateCaption: '卡納克神廟壁面刻滿圖特摩斯三世十七次遠征的戰果與西亞貢品名錄。',
+        turningPoint: '在美吉多戰役大破迦南聯軍，二十年間發動十餘次遠征，將埃及帝國版圖北推至幼發拉底河、南達第四瀑布。',
+        themes: ['warfare', 'unification', 'diplomacy'],
+        inherited: '哈特謝普蘇特逝世後，敘利亞—迦南諸邦在卡迭石王率領下群起反叛，意圖擺脫埃及宗主權。',
+        choices: '圖特摩斯三世親政首年即出奇兵穿越狹窄的阿魯納山道突襲美吉多獲勝；其後建立高效常備軍與海軍補給線，並將附庸國王子接往埃及宮廷教育，以軟硬兼施穩固帝國秩序。',
+        legacy: '建立古埃及史上最遼闊的帝國版圖與穩定的西亞朝貢體系，為後續阿蒙霍特普三世的黃金盛世奠定雄厚財富基礎。',
+        quoteZh: '「攻克美吉多，等同於攻克一千座城池！」',
+        quoteEn: 'Annals of Thutmose III at Karnak: "The capturing of Megiddo is the capturing of a thousand towns!"',
+        quoteSource: '卡納克神廟《圖特摩斯三世戰記》銘文',
+        quoteUrl: 'https://www.worldhistory.org/Egyptian_Empire/',
+        milestones: [
+          { year: '約 1457 BCE', text: '親征並贏得史上首場有詳盡戰術記載的「美吉多戰役」。' },
+          { year: '約 1446 BCE', text: '遠征橫渡幼發拉底河，重創米坦尼王國並立石碑誌功。' },
+          { year: '約 1430 BCE', text: '完成卡納克節日殿與戰記浮雕，締造空前帝國威望。' }
+        ],
+        links: [
+          { title: 'World History：Egyptian Empire', url: 'https://www.worldhistory.org/Egyptian_Empire/' },
+          { title: 'Wikipedia：Battle of Megiddo', url: 'https://en.wikipedia.org/wiki/Battle_of_Megiddo_(15th_century_BC)' }
+        ],
+        map: {
+          start: {
+            subtitle: '親政初年・迦南諸邦叛亂威脅東北邊防',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['delta', 'memphis', 'thebes', 'megiddo'],
+            capitalSite: 'thebes',
+            arcs: [['delta', 'megiddo']],
+            note: '親政之際敘利亞與迦南城邦集結於美吉多，圖特摩斯三世迅速北上迎戰。'
+          },
+          peak: {
+            subtitle: '帝國極盛疆域・北抵敘利亞、南達納帕塔',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275', '422', '760', '400'],
+            sites: ['delta', 'memphis', 'thebes', 'abusimbel', 'napata', 'megiddo', 'kadesh'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'delta'], ['delta', 'megiddo'], ['megiddo', 'kadesh'], ['thebes', 'napata']],
+            note: '十七次遠征後，埃及勢力北達卡迭石與幼發拉底河、南抵納帕塔（巴爾卡爾山），寫下疆域最高峰。'
+          }
+        }
+      },
+      {
+        id: 'akhenaten',
+        numLabel: '10',
+        eraId: 'era4',
+        dynasty: '第十八王朝',
+        nameZh: '阿肯那頓',
+        nameEn: 'Akhenaten',
+        epithet: '推動太陽神阿頓宗教革命的「異端法老」',
+        yearsText: '約 1353–1336 BCE',
+        startBce: 1353,
+        reignYears: 17,
+        capital: '阿瑪納（阿赫塔頓）',
+        plateImg: PLATES.ramesses,
+        plateCaption: '新王國時期的巨型石雕與太陽神崇拜地景；阿肯那頓曾短暫以新都阿瑪納顛覆千年多神傳統。',
+        turningPoint: '關閉傳統阿蒙神廟、獨尊太陽圓盤「阿頓」（Aten）並遷都阿瑪納，發動人類歷史上最早的國家級一神教實驗。',
+        themes: ['religion', 'reform', 'diplomacy'],
+        inherited: '父親阿蒙霍特普三世留下空前繁榮的帝國，但底比斯的阿蒙祭司團財富與政治影響力已膨脹至足以制衡王權。',
+        choices: '原名阿蒙霍特普四世的他更名為「阿肯那頓」，與王后娜芙蒂蒂在中埃及荒漠興建新都阿赫塔頓（今阿瑪納），並推動寫實、親密的「阿瑪納藝術風格」，大幅削弱傳統神職集團。',
+        legacy: '雖然新信仰在其逝世後迅速遭廢除、外交檔案《阿瑪納泥板》也顯示西亞邊防鬆動，但這場宗教與藝術革命成為古埃及史上最具衝擊力的文化異數。',
+        quoteZh: '「唯獨你這位獨一無二的神，除你之外別無他神；你按自己的心意創造了大地。」',
+        quoteEn: 'Great Hymn to the Aten: "O sole god, like whom there is no other! Thou didst create the world according to thy desire."',
+        quoteSource: '《阿頓大讚美詩》（阿瑪納貴族阿伊墓壁銘文）',
+        quoteUrl: 'https://en.wikipedia.org/wiki/Amarna_Period',
+        milestones: [
+          { year: '約 1353 BCE', text: '以阿蒙霍特普四世之名即位，迅速抬升太陽神阿頓地位。' },
+          { year: '約 1348 BCE', text: '更名阿肯那頓並於中埃及宣告建立新都「阿赫塔頓」（阿瑪納）。' },
+          { year: '約 1336 BCE', text: '駕崩後新都迅速荒廢，留下珍貴的外交檔案《阿瑪納泥板》。' }
+        ],
+        links: [
+          { title: 'Wikipedia：Amarna Period', url: 'https://en.wikipedia.org/wiki/Amarna_Period' },
+          { title: 'Britannica：List of Pharaohs', url: 'https://www.britannica.com/topic/list-of-pharaohs-of-ancient-Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '即位初期・仍以底比斯為宮廷中心',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275', '422'],
+            sites: ['memphis', 'thebes', 'megiddo'],
+            capitalSite: 'thebes',
+            arcs: [['thebes', 'memphis']],
+            note: '執政前數年仍在底比斯卡納克附近興建阿頓神殿，與傳統阿蒙祭司團正面衝突。'
+          },
+          peak: {
+            subtitle: '遷都阿瑪納・中埃及新都與西亞外交告急',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275'],
+            sites: ['delta', 'memphis', 'amarna', 'thebes', 'megiddo'],
+            capitalSite: 'amarna',
+            arcs: [['thebes', 'amarna'], ['amarna', 'megiddo']],
+            note: '政治重心遷往中埃及新都阿瑪納，而《阿瑪納泥板》紀錄著黎凡特附庸邦紛紛求援、西臺勢力南侵。'
+          }
+        }
+      },
+      {
+        id: 'tutankhamun',
+        numLabel: '11',
+        eraId: 'era4',
+        dynasty: '第十八王朝',
+        nameZh: '圖坦卡門',
+        nameEn: 'Tutankhamun',
+        epithet: '恢復阿蒙信仰的少年法老，因帝王谷完整陵墓聞名世界',
+        yearsText: '約 1333–1324 BCE',
+        startBce: 1333,
+        reignYears: 9,
+        capital: '底比斯／孟菲斯',
+        plateImg: PLATES.newk,
+        plateCaption: '圖坦卡門重返底比斯與卡納克神廟體系，修復遭阿瑪納時期破壞的傳統神祇崇拜。',
+        turningPoint: '廢除阿肯那頓的一神教改革、遷離阿瑪納並全面恢復傳統多神秩序；三千年後其幾乎未被盜掘的陵墓成為考古奇蹟。',
+        themes: ['religion', 'succession', 'monuments'],
+        inherited: '年約九歲即位，接手的是宗教撕裂、傳統神廟荒廢、外交威信受損的後阿瑪納危機局面。',
+        choices: '在大臣阿伊與將軍霍倫海布輔佐下，少年法老將原名「圖坦卡頓」改為「圖坦卡門」，頒布《復辟碑》宣布重開阿蒙與諸神神廟，並將宮廷遷回孟菲斯與底比斯。',
+        legacy: '雖然在位僅約九年、年僅十餘歲便英年早逝，但 1922 年霍華德・卡特於帝王谷發掘的 KV62 陵墓（黃金面具與五千餘件陪葬品），讓世人得以窺見新王國宮廷工藝的真實樣貌。',
+        quoteZh: '「諸神的神廟自象島至三角洲沼澤皆已荒蕪……陛下遂立志使全埃及重回往昔秩序。」',
+        quoteEn: 'Restoration Stela of Tutankhamun at Karnak: "The temples of the gods and goddesses from Elephantine to the Delta marshes had fallen into neglect..."',
+        quoteSource: '卡納克神廟《圖坦卡門復辟碑》銘文',
+        quoteUrl: 'https://kids.britannica.com/students/article/ancient-Egypt/274132',
+        milestones: [
+          { year: '約 1333 BCE', text: '年幼登基，不久即改名「圖坦卡門」（阿蒙神的活形象）。' },
+          { year: '約 1330 BCE', text: '遷離阿瑪納並頒布《復辟碑》，修復卡納克與路克索神廟。' },
+          { year: '約 1324 BCE', text: '早逝並匆促安葬於帝王谷 KV62 墓室，反令陵墓躲過後世大舉盜掘。' }
+        ],
+        links: [
+          { title: 'Britannica：Ancient Egypt', url: 'https://kids.britannica.com/students/article/ancient-Egypt/274132' },
+          { title: 'TheCollector：Essential Pharaohs', url: 'https://www.thecollector.com/essential-egyptian-pharaohs/' }
+        ],
+        map: {
+          start: {
+            subtitle: '即位初期・尚駐留阿瑪納',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['amarna', 'thebes'],
+            capitalSite: 'amarna',
+            arcs: [['amarna', 'thebes']],
+            note: '登基最初兩年仍處於阿瑪納體制下，國內神廟經濟與祭祀秩序百廢待興。'
+          },
+          peak: {
+            subtitle: '信仰復辟・重返孟菲斯與底比斯雙核心',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275'],
+            sites: ['memphis', 'thebes', 'abusimbel'],
+            capitalSite: 'thebes',
+            arcs: [['amarna', 'memphis'], ['memphis', 'thebes']],
+            note: '徹底放棄阿瑪納，以孟菲斯為行政首都、底比斯為宗教與王陵聖地，重拾傳統秩序。'
+          }
+        }
+      },
+      {
+        id: 'ramesses2',
+        numLabel: '12',
+        eraId: 'era5',
+        dynasty: '第十九王朝',
+        nameZh: '拉美西斯二世',
+        nameEn: 'Ramesses II',
+        epithet: '拉美西斯大帝，卡迭石戰役主角、史上首份和平條約締約者',
+        yearsText: '1279–1213 BCE',
+        startBce: 1279,
+        reignYears: 66,
+        capital: '培爾—拉美西斯（東三角洲）',
+        plateImg: PLATES.ramesses,
+        plateCaption: '阿布辛貝岩窟神廟的四尊拉美西斯二世巨像，矗立於尼羅河畔展現帝國威儀。',
+        turningPoint: '在卡迭石與西臺帝國激戰後，於西元前 1259 年簽訂人類史上首份存世的跨國書面和平條約，開創數十年繁榮建設期。',
+        themes: ['diplomacy', 'monuments', 'warfare'],
+        inherited: '父親塞提一世已重振軍威，但新興的安納托利亞強權西臺帝國正與埃及激烈爭奪敘利亞與黎凡特控制權。',
+        choices: '拉美西斯二世於東三角洲興建新都培爾—拉美西斯以貼近西亞前線；卡迭石戰役陷入僵局後，他展現務實外交手腕與西臺簽署《埃及—西臺和約》並聯姻，並將龐大國力投入阿布辛貝、拉美西姆與卡納克柱廳等建築工程。',
+        legacy: '在位長達 66 年，留下數量冠絕歷代法老的巨像、神廟與銘文，其和平條約副本至今仍陳列於聯合國總部作為外交典範。',
+        quoteZh: '「埃及大王與西臺大王締結永恆的善意與兄弟之盟，自今日起兩國永不再起戰端。」',
+        quoteEn: 'Egyptian–Hittite Peace Treaty (c. 1259 BCE): "There shall be good peace and good brotherhood between them forever."',
+        quoteSource: '《埃及—西臺和平條約》（卡納克神廟與哈圖沙泥板雙語存世）',
+        quoteUrl: 'https://www.worldhistory.org/Egyptian_Empire/',
+        milestones: [
+          { year: '1274 BCE', text: '率領四個軍團與西臺帝國爆發著名的「卡迭石戰車大戰」。' },
+          { year: '約 1259 BCE', text: '與西臺王哈圖西里三世簽署史上首份存世國際和平條約。' },
+          { year: '約 1244 BCE', text: '於下努比亞完成宏偉的阿布辛貝大小岩窟神廟。' }
+        ],
+        links: [
+          { title: 'Britannica：Ramses II', url: 'https://www.britannica.com/biography/Ramses-II-king-of-Egypt/Prosperity-during-the-reign-of-Ramses-II' },
+          { title: 'World History：Egyptian Empire', url: 'https://www.worldhistory.org/Egyptian_Empire/' }
+        ],
+        map: {
+          start: {
+            subtitle: '統治初期・北上敘利亞決戰卡迭石',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275', '422'],
+            sites: ['delta', 'thebes', 'megiddo', 'kadesh'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'megiddo'], ['megiddo', 'kadesh']],
+            note: '在東三角洲建都培爾—拉美西斯，迅速北上黎凡特與西臺爭奪卡迭石戰略樞紐。'
+          },
+          peak: {
+            subtitle: '和約穩固疆界・全境大興阿布辛貝與神廟',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275', '422', '400'],
+            sites: ['delta', 'memphis', 'abydos', 'thebes', 'abusimbel', 'megiddo', 'kadesh'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'kadesh'], ['delta', 'thebes'], ['thebes', 'abusimbel']],
+            note: '與西臺劃界和平共處後，從三角洲至阿布辛貝展開古埃及史上最大規模的紀念建築計畫。'
+          }
+        }
+      },
+      {
+        id: 'ramesses3',
+        numLabel: '13',
+        eraId: 'era5',
+        dynasty: '第二十王朝',
+        nameZh: '拉美西斯三世',
+        nameEn: 'Ramesses III',
+        epithet: '新王國最後一位偉大戰士法老，於青銅時代崩潰浪潮中力保埃及',
+        yearsText: '1186–1155 BCE',
+        startBce: 1186,
+        reignYears: 31,
+        capital: '培爾—拉美西斯／底比斯',
+        plateImg: PLATES.ramesses,
+        plateCaption: '拉美西斯時代雄偉的砂岩神廟與壁面浮雕，記錄了埃及在三角洲迎戰海上民族的史詩海戰。',
+        turningPoint: '在西臺帝國與邁錫尼文明相繼覆滅的「青銅時代晚期崩潰」中，率領陸海軍成功擊退「海上民族」入侵，守住埃及命脈。',
+        themes: ['warfare', 'transition', 'monuments'],
+        inherited: '第十九王朝末年王室動盪，東地中海各地則因乾旱、饑荒與民族遷徙爆發連鎖崩潰，大批「海上民族」與利比亞部落接連進逼埃及。',
+        choices: '拉美西斯三世在黎凡特陸戰與尼羅河三角洲水戰中設下弓箭伏擊，徹底擊潰海上民族艦隊；同時在底比斯西岸興建宏偉的麥迪納特・哈布祭廟銘記戰功。',
+        legacy: '雖然成功避免埃及立即亡國，但長期軍費與通膨掏空國庫，任內爆發史上最早有記載的工匠罷工（代爾埃爾麥迪納）與宮廷暗殺案，新王國自此步向黃昏。',
+        quoteZh: '「沒有任何國家能抵擋他們的軍隊……但我已在尼羅河口設下天羅地網，將他們徹底殲滅於河岸。」',
+        quoteEn: 'Medinet Habu Inscription of Ramesses III: "No land could stand before their arms... Those who reached my frontier, their seed is not."',
+        quoteSource: '麥迪納特・哈布神廟《海上民族戰役浮雕》銘文',
+        quoteUrl: 'https://www.worldhistory.org/Egyptian_Empire/',
+        milestones: [
+          { year: '1186 BCE', text: '即位第二十王朝，接連擊退利比亞部落對西三角洲的侵擾。' },
+          { year: '約 1177 BCE', text: '於三角洲河口發動伏擊海戰，大破「海上民族」聯軍。' },
+          { year: '約 1155 BCE', text: '爆發代爾埃爾麥迪納工匠罷工，不久後遭遇「後宮陰謀」遇刺身亡。' }
+        ],
+        links: [
+          { title: 'World History：Egyptian Empire', url: 'https://www.worldhistory.org/Egyptian_Empire/' },
+          { title: 'TheCollector：Essential Pharaohs', url: 'https://www.thecollector.com/essential-egyptian-pharaohs/' }
+        ],
+        map: {
+          start: {
+            subtitle: '多線告急・利比亞與海上民族夾擊三角洲',
+            countries: ['818'],
+            influenceCountries: ['729', '376', '275'],
+            sites: ['delta', 'thebes', 'megiddo'],
+            capitalSite: 'delta',
+            arcs: [['megiddo', 'delta']],
+            note: '東地中海各古國接連傾覆，海上民族沿黎凡特海岸水陸並進直撲尼羅河口。'
+          },
+          peak: {
+            subtitle: '守住本土疆域・新王國最後的帝國防線',
+            countries: ['818'],
+            influenceCountries: ['729'],
+            sites: ['delta', 'memphis', 'thebes', 'abusimbel'],
+            capitalSite: 'thebes',
+            arcs: [['delta', 'thebes'], ['thebes', 'abusimbel']],
+            note: '成功保全埃及本土與下努比亞，但西亞行省逐漸脫離掌控，帝國轉入收縮期。'
+          }
+        }
+      },
+      {
+        id: 'piye',
+        numLabel: '14',
+        eraId: 'era6',
+        dynasty: '第二十五王朝（庫施王朝）',
+        nameZh: '皮耶',
+        nameEn: 'Piye',
+        epithet: '來自努比亞的「黑法老」，以敬虔阿蒙信仰重新統一上下埃及',
+        yearsText: '約 744–714 BCE',
+        startBce: 744,
+        reignYears: 30,
+        capital: '納帕塔（兼治底比斯）',
+        plateImg: PLATES.middle,
+        plateCaption: '橫跨尼羅河谷與努比亞聖山的神廟建築，見證第25王朝復興古王國與中王國古典傳統。',
+        turningPoint: '約西元前 727 年自南方庫施王國北上平定分裂的三角洲諸侯，建立跨越埃及與蘇丹的龐大第二十五王朝。',
+        themes: ['unification', 'transition', 'religion'],
+        inherited: '第三中間期埃及再度四分五裂，下埃及諸侯割據並面臨西亞新亞述帝國步步逼近的威脅。',
+        choices: '虔誠崇拜阿蒙神的庫施國王皮耶率軍北上，攻克赫爾莫波利斯與孟菲斯，迫使北方領袖泰夫納赫特稱臣；他將自己定位為古埃及正統禮儀的守護者，而非外來征服者。',
+        legacy: '開啟橫跨尼羅河上游至地中海的「庫施王朝」，不僅大幅修繕底比斯神廟，更將古老的金字塔王陵傳統重新帶回努比亞土地。',
+        quoteZh: '「我所行一切皆依阿蒙神旨意；進入神殿前必須潔淨身心，方配得稱為兩地之王。」',
+        quoteEn: 'Victory Stela of Piye at Jebel Barkal, recording his northern campaign to reunify Egypt and his devotion to Amun.',
+        quoteSource: '巴爾卡爾山《皮耶勝利碑》（開羅埃及博物館典藏）',
+        quoteUrl: 'https://www.britannica.com/place/ancient-Egypt/Egypt-from-1076-bce-to-the-Macedonian-invasion',
+        milestones: [
+          { year: '約 744 BCE', text: '於庫施都城納帕塔即位，將勢力穩固延伸至上埃及底比斯。' },
+          { year: '約 727 BCE', text: '親率大軍北征，連克中埃及與孟菲斯，接受北方諸侯臣服。' },
+          { year: '約 714 BCE', text: '駕崩後葬於努比亞埃爾庫魯金字塔墓地，開啟庫施王室金字塔傳統。' }
+        ],
+        links: [
+          { title: 'Britannica：Egypt (1076–332 BCE)', url: 'https://www.britannica.com/place/ancient-Egypt/Egypt-from-1076-bce-to-the-Macedonian-invasion' },
+          { title: 'Wikipedia：Ancient Egypt', url: 'https://en.wikipedia.org/wiki/Ancient_Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '北征前夕・立足納帕塔與上埃及底比斯',
+            countries: ['729'],
+            influenceCountries: ['818'],
+            sites: ['napata', 'abusimbel', 'thebes'],
+            capitalSite: 'napata',
+            arcs: [['napata', 'thebes']],
+            note: '以蘇丹北部納帕塔（巴爾卡爾山）為基地，掌控底比斯並觀察北方諸侯內鬥。'
+          },
+          peak: {
+            subtitle: '尼羅河全流域統一・跨越努比亞至孟菲斯',
+            countries: ['818', '729'],
+            influenceCountries: [],
+            sites: ['napata', 'abusimbel', 'thebes', 'memphis', 'delta'],
+            capitalSite: 'napata',
+            arcs: [['napata', 'thebes'], ['thebes', 'memphis'], ['memphis', 'delta']],
+            note: '北進收服孟菲斯與三角洲諸侯，建立縱貫兩千餘公里尼羅河的雙王國版圖。'
+          }
+        }
+      },
+      {
+        id: 'psamtik1',
+        numLabel: '15',
+        eraId: 'era6',
+        dynasty: '第二十六王朝（塞易斯王朝）',
+        nameZh: '普薩美提克一世',
+        nameEn: 'Psamtik I',
+        epithet: '擺脫亞述統治的復國君主，開啟「塞易斯文藝復興」',
+        yearsText: '664–610 BCE',
+        startBce: 664,
+        reignYears: 54,
+        capital: '塞易斯（西三角洲）',
+        plateImg: PLATES.early,
+        plateCaption: '後期王朝時期復古風格的尼羅河神廟與商船，反映埃及在地中海貿易中的再度勃興。',
+        turningPoint: '巧妙借力希臘與呂底亞傭兵擺脫新亞述帝國附庸地位，重新統一埃及並引領最後一波本土文化復興。',
+        themes: ['unification', 'diplomacy', 'transition'],
+        inherited: '新亞述帝國大軍剛攻陷底比斯並逐出庫施王朝，普薩美提克一世最初只是亞述扶植於三角洲塞易斯的附庸領主。',
+        choices: '他趁亞述帝國後院起火之際，引進愛奧尼亞與卡里亞「青銅武士」傭兵統一三角洲，並以和平外交讓女兒成為底比斯阿蒙神妻，兵不血刃收回上埃及；同時開放希臘商人在三角洲通商。',
+        legacy: '在位 54 年使埃及重返獨立與富裕，藝術界刻意仿效古王國與中王國的古典美學（塞易斯文藝復興），並開啟埃及與希臘世界的深度交流。',
+        quoteZh: '「神諭應許，當海上出現身披青銅甲冑的戰士時，他必將成為全埃及的統治者。」',
+        quoteEn: 'Herodotus & Egyptian records recount how Psamtik I allied with Ionian and Carian bronze-armored mercenaries to unify Egypt and end Assyrian vassalage.',
+        quoteSource: '希羅多德《歷史》與普薩美提克一世收養碑文記載',
+        quoteUrl: 'https://en.wikipedia.org/wiki/Psamtik_I',
+        milestones: [
+          { year: '664 BCE', text: '受亞述任命於塞易斯登基，創立第二十六王朝。' },
+          { year: '656–654 BCE', text: '和平整合底比斯並驅逐利比亞部族，完全掌控全埃及並脫離亞述控制。' },
+          { year: '約 620 BCE', text: '隨著亞述帝國崩解，派軍北進黎凡特維持區域均勢並拓展地中海貿易。' }
+        ],
+        links: [
+          { title: 'Wikipedia：Psamtik I', url: 'https://en.wikipedia.org/wiki/Psamtik_I' },
+          { title: 'Britannica：Tefnakhte & 26th Dynasty', url: 'https://www.britannica.com/biography/Tefnakhte' }
+        ],
+        map: {
+          start: {
+            subtitle: '664 BCE・三角洲塞易斯附庸政權起步',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'memphis'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'memphis']],
+            note: '起初僅以西三角洲塞易斯為據點，名義上隸屬新亞述帝國。'
+          },
+          peak: {
+            subtitle: '塞易斯獨立統一・廣設邊防要塞與希臘商埠',
+            countries: ['818'],
+            influenceCountries: ['376', '275'],
+            sites: ['delta', 'memphis', 'thebes', 'megiddo'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'thebes'], ['delta', 'megiddo']],
+            note: '十年內和平統一全境，在東境與南境駐紮傭兵守備，並與地中海東岸展開興盛貿易。'
+          }
+        }
+      },
+      {
+        id: 'ptolemy1',
+        numLabel: '16',
+        eraId: 'era7',
+        dynasty: '托勒密王朝',
+        nameZh: '托勒密一世',
+        nameEn: 'Ptolemy I Soter',
+        epithet: '亞歷山大麾下名將，開創希臘化托勒密王朝與亞歷山大圖書館',
+        yearsText: '305–282 BCE（323 BCE 起任總督）',
+        startBce: 305,
+        reignYears: 23,
+        capital: '亞歷山卓',
+        plateImg: PLATES.ptolemy,
+        plateCaption: '托勒密時期的亞歷山卓港、法羅斯燈塔與融合希臘列柱和埃及紙草柱頭的宏偉建築。',
+        turningPoint: '在亞歷山大大帝驟逝後據守埃及並自立為法老，將新都亞歷山卓打造成地中海世界的學術、貿易與文化首都。',
+        themes: ['transition', 'monuments', 'religion', 'diplomacy'],
+        inherited: '埃及先後歷經波斯統治與西元前 332 年亞歷山大大帝進駐；亞歷山大於 323 BCE 病逝後，龐大帝國陷入繼業者戰爭。',
+        choices: '托勒密一世果斷選取富庶易守的埃及為根據地，迎回亞歷山大靈柩安葬於亞歷山卓以彰顯正統；他一方面創設塞拉皮斯（Serapis）融合信仰與修復埃及神廟，一方面奠基亞歷山大博學園與圖書館，並啟動法羅斯燈塔工程。',
+        legacy: '開創統治埃及近三百年的托勒密王朝，使埃及成為希臘化時代最具影響力的知識與穀物經濟中心。',
+        quoteZh: '「托勒密以『救世主』（Soter）之名加冕為王，使亞歷山卓成為匯聚萬邦學者與商船的明燈。」',
+        quoteEn: 'Ptolemy I Soter assumed the title of Pharaoh in 305 BCE, establishing the Ptolemaic Dynasty and fostering the Museum and Library of Alexandria.',
+        quoteSource: '希臘化史籍與托勒密一世王朝建置紀年',
+        quoteUrl: 'https://www.worldhistory.org/egypt/',
+        milestones: [
+          { year: '323 BCE', text: '亞歷山大大帝逝世，托勒密出任埃及總督並成功擊退繼業者聯軍入侵。' },
+          { year: '305 BCE', text: '正式稱王並接受法老頭銜，號稱「救世主」（Soter），建立托勒密王朝。' },
+          { year: '約 290 BCE', text: '規劃亞歷山大博學園、大圖書館與法羅斯燈塔，奠定地中海文化霸權。' }
+        ],
+        links: [
+          { title: 'World History：Ancient Egypt', url: 'https://www.worldhistory.org/egypt/' },
+          { title: 'Wikipedia：History of Ancient Egypt', url: 'https://en.wikipedia.org/wiki/History_of_ancient_Egypt' }
+        ],
+        map: {
+          start: {
+            subtitle: '323 BCE・出任埃及總督，鞏固三角洲門戶',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'memphis'],
+            capitalSite: 'delta',
+            arcs: [['memphis', 'delta']],
+            note: '最初以孟菲斯為舊都過渡，迅速將行政與海軍重心轉移至地中海畔的新城亞歷山卓。'
+          },
+          peak: {
+            subtitle: '托勒密王國確立・輻射東地中海與黎凡特',
+            countries: ['818'],
+            influenceCountries: ['376', '275', '422', '434'],
+            sites: ['delta', 'memphis', 'thebes'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'megiddo'], ['delta', 'thebes']],
+            note: '以亞歷山卓為地中海海權與學術中樞，勢力同時涵蓋昔蘭尼加（利比亞東境）與南黎凡特。'
+          }
+        }
+      },
+      {
+        id: 'cleopatra7',
+        numLabel: '17',
+        eraId: 'era7',
+        dynasty: '托勒密王朝',
+        nameZh: '克麗奧佩脫拉七世',
+        nameEn: 'Cleopatra VII',
+        epithet: '古埃及最後一位實權女法老，在羅馬帝國崛起浪潮中力挽狂瀾',
+        yearsText: '51–30 BCE',
+        startBce: 51,
+        reignYears: 21,
+        capital: '亞歷山卓',
+        plateImg: PLATES.ptolemy,
+        plateCaption: '亞歷山卓的宏偉海港與希臘—埃及合璧宮廷，見證三千年法老時代的最後餘暉。',
+        turningPoint: '精通多國語言且首度學會古埃及語的托勒密君主，透過與凱撒、安東尼結盟力圖保衛埃及獨立，最終於亞克興戰役敗給屋大維而結束法老紀元。',
+        themes: ['succession', 'diplomacy', 'transition'],
+        inherited: '托勒密王朝後期深陷王室兄妹內鬥與國債危機，而羅馬共和國的軍事勢力已成為東地中海無可匹敵的主宰。',
+        choices: '克麗奧佩脫拉七世以卓越的外交與經濟手腕重整國內財政，先後結盟尤利烏斯・凱撒與馬克・安東尼，試圖借助羅馬內部勢力重振托勒密王國在地中海東岸的版圖與獨立地位。',
+        legacy: '西元前 31 年亞克興海戰敗北、前 30 年自盡後，埃及正式併入羅馬帝國成為行省，延續超過三千年的古埃及法老時代就此畫下句點。',
+        quoteZh: '「她不僅以機智與學識折服眾人，更是整個托勒密王室中第一位能直接用埃及語與子民對話的統治者。」',
+        quoteEn: 'Plutarch’s Life of Antony highlights Cleopatra VII’s multilingual diplomacy and her unique fluency in the Egyptian language among Ptolemaic rulers.',
+        quoteSource: '普魯塔克《希臘羅馬名人傳・安東尼傳》記載',
+        quoteUrl: 'https://www.worldhistory.org/egypt/',
+        milestones: [
+          { year: '51 BCE', text: '登基為托勒密王朝共同統治者，成為首位通曉古埃及語的王朝君主。' },
+          { year: '48–41 BCE', text: '先後與凱撒及安東尼結盟，穩固王位並一度重奪東地中海故土。' },
+          { year: '31–30 BCE', text: '亞克興海戰敗於屋大維，次年於亞歷山卓自盡，埃及併入羅馬行省。' }
+        ],
+        links: [
+          { title: 'World History：Ancient Egypt', url: 'https://www.worldhistory.org/egypt/' },
+          { title: 'TheCollector：Essential Pharaohs', url: 'https://www.thecollector.com/essential-egyptian-pharaohs/' }
+        ],
+        map: {
+          start: {
+            subtitle: '51 BCE・內憂外患下的亞歷山卓王廷',
+            countries: ['818'],
+            influenceCountries: [],
+            sites: ['delta', 'memphis', 'thebes'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'thebes']],
+            note: '即位初期面對宮廷內戰與羅馬債權壓力，積極鞏固本土穀倉與神廟支持。'
+          },
+          peak: {
+            subtitle: '34–30 BCE・東地中海聯盟與法老時代終章',
+            countries: ['818'],
+            influenceCountries: ['376', '275', '422', '434'],
+            sites: ['delta', 'memphis', 'thebes', 'megiddo'],
+            capitalSite: 'delta',
+            arcs: [['delta', 'megiddo'], ['delta', 'thebes']],
+            note: '透過與安東尼結盟短暫重振東地中海勢力，最終於西元前 30 年併入羅馬帝國。'
+          }
+        }
+      }
+    ];
+
+    // Application State
+    const state = {
+      currentIndex: 0,
+      mapMode: 'peak',
+      activeTheme: 'all',
+      isPlaying: false,
+      speed: '1',
+      timerId: null,
+      worldTopo: null
+    };
+
+    // DOM Elements
+    const elEraTabs = document.getElementById('era-tabs');
+    const elSelect = document.getElementById('pharaoh-select');
+    const elCounter = document.getElementById('scene-counter');
+    const elWatermark = document.getElementById('watermark-number');
+    const elEraBadge = document.getElementById('stage-era-badge');
+    const elDynastyBadge = document.getElementById('stage-dynasty-badge');
+    const elYears = document.getElementById('stage-years');
+    const elNameZh = document.getElementById('stage-name-zh');
+    const elNameEn = document.getElementById('stage-name-en');
+    const elEpithet = document.getElementById('stage-epithet');
+    const elPlateImg = document.getElementById('stage-plate-img');
+    const elPlateCaption = document.getElementById('stage-plate-caption');
+    const elMapSubtitle = document.getElementById('map-subtitle');
+    const elMapNote = document.getElementById('map-note');
+    const elBtnMapStart = document.getElementById('btn-map-start');
+    const elBtnMapPeak = document.getElementById('btn-map-peak');
+    const elStatCapital = document.getElementById('stat-capital');
+    const elStatDuration = document.getElementById('stat-duration');
+    const elSparkReignLabel = document.getElementById('spark-reign-label');
+    const elSparkYearLabel = document.getElementById('spark-year-label');
+    const elTurningPoint = document.getElementById('stage-turning-point');
+    const elStageThemeTags = document.getElementById('stage-theme-tags');
+    const elInherited = document.getElementById('narrative-inherited');
+    const elChoices = document.getElementById('narrative-choices');
+    const elLegacy = document.getElementById('narrative-legacy');
+    const elQuoteZh = document.getElementById('quote-zh');
+    const elQuoteEn = document.getElementById('quote-en');
+    const elQuoteSourceTitle = document.getElementById('quote-source-title');
+    const elQuoteSourceLink = document.getElementById('quote-source-link');
+    const elMilestones = document.getElementById('stage-milestones');
+    const elLinks = document.getElementById('stage-links');
+    const elTimelineRibbon = document.getElementById('timeline-ribbon');
+    const elTimelineLegend = document.getElementById('timeline-legend');
+    const elTimelineSlider = document.getElementById('timeline-slider');
+    const elTimelineActiveLabel = document.getElementById('timeline-active-label');
+    const elThemeFilterBar = document.getElementById('theme-filter-bar');
+    const elThemeCardsGrid = document.getElementById('theme-cards-grid');
+    const elBtnPlay = document.getElementById('btn-play');
+    const elPlayIcon = document.getElementById('play-icon');
+    const elPlayLabel = document.getElementById('play-label');
+    const elPlaybackSpeed = document.getElementById('playback-speed');
+    const elBarCurrentTitle = document.getElementById('bar-current-title');
+    const elBarStatusMsg = document.getElementById('bar-status-msg');
+    const elLightboxModal = document.getElementById('lightbox-modal');
+    const elLightboxImg = document.getElementById('lightbox-img');
+    const elLightboxTitle = document.getElementById('lightbox-title');
+    const elLightboxCaption = document.getElementById('lightbox-caption');
+
+    function getEraById(id) {
+      return ERAS.find(e => e.id === id) || ERAS[0];
+    }
+
+    function getThemeById(id) {
+      return THEMES.find(t => t.id === id);
+    }
+
+    function pad2(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function scrollToStage() {
+      const stage = document.getElementById('main-stage');
+      if (stage) {
+        stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function stopPlayback() {
+      state.isPlaying = false;
+      if (state.timerId) {
+        clearTimeout(state.timerId);
+        state.timerId = null;
+      }
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+      elPlayIcon.textContent = '▶';
+      elPlayLabel.textContent = '播放';
+      elBarStatusMsg.textContent = '';
+    }
+
+    function runPlaybackStep() {
+      if (!state.isPlaying) return;
+      const p = PHARAOHS[state.currentIndex];
+
+      if (state.speed === '1' && 'speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const text = `${p.nameZh}，${p.dynasty}，${p.yearsText}。${p.turningPoint} 接下局面：${p.inherited} 所做選擇：${p.choices} 歷史影響：${p.legacy}`;
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'zh-TW';
+          utter.rate = 1.0;
+          elBarStatusMsg.textContent = '・語音朗讀中';
+          utter.onend = () => {
+            if (!state.isPlaying) return;
+            if (state.currentIndex < PHARAOHS.length - 1) {
+              goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true });
+            } else {
+              stopPlayback();
+            }
+          };
+          utter.onerror = () => {
+            if (!state.isPlaying) return;
+            elBarStatusMsg.textContent = '・自動瀏覽中';
+            state.timerId = setTimeout(() => {
+              if (!state.isPlaying) return;
+              if (state.currentIndex < PHARAOHS.length - 1) {
+                goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true });
+              } else {
+                stopPlayback();
+              }
+            }, 9000);
+          };
+          window.speechSynthesis.speak(utter);
+          return;
+        } catch (e) {
+          // Fallback to timer
+        }
+      }
+
+      const delayMs = state.speed === '5' ? 4000 : state.speed === '2' ? 8000 : 10000;
+      elBarStatusMsg.textContent = state.speed === '5' ? '・5× 快速導覽中' : '・自動瀏覽中';
+      state.timerId = setTimeout(() => {
+        if (!state.isPlaying) return;
+        if (state.currentIndex < PHARAOHS.length - 1) {
+          goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true });
+        } else {
+          stopPlayback();
+        }
+      }, delayMs);
+    }
+
+    function startPlayback() {
+      stopPlayback();
+      state.isPlaying = true;
+      elPlayIcon.textContent = '❚❚';
+      elPlayLabel.textContent = '暫停';
+      runPlaybackStep();
+    }
+
+    function goToScene(index, opts = {}) {
+      const clamped = Math.max(0, Math.min(PHARAOHS.length - 1, index));
+      const keepPlaying = Boolean(opts.keepPlaying);
+      if (!keepPlaying && state.isPlaying) {
+        stopPlayback();
+      }
+      state.currentIndex = clamped;
+      renderAll();
+      if (opts.scroll) {
+        scrollToStage();
+      }
+      if (keepPlaying && state.isPlaying) {
+        runPlaybackStep();
+      }
+    }
+
+    // Build Static UI Controls
+    function initEraTabs() {
+      elEraTabs.innerHTML = '';
+      ERAS.forEach(era => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.eraId = era.id;
+        btn.className = 'era-tab text-left px-3 py-2 rounded-lg border border-white/15 bg-white/5 text-white text-xs sm:text-sm';
+        btn.innerHTML = `<div class="font-bold truncate">${era.code}｜${era.label}</div><div class="text-[11px] opacity-80 truncate">${era.span}</div>`;
+        btn.addEventListener('click', () => {
+          const firstIdx = PHARAOHS.findIndex(p => p.eraId === era.id);
+          if (firstIdx !== -1) {
+            goToScene(firstIdx, { scroll: true });
+          }
+        });
+        elEraTabs.appendChild(btn);
+      });
+    }
+
+    function initSelectDropdown() {
+      elSelect.innerHTML = '';
+      ERAS.forEach(era => {
+        const group = document.createElement('optgroup');
+        group.label = `${era.code}｜${era.label}（${era.span}）`;
+        PHARAOHS.forEach((p, idx) => {
+          if (p.eraId === era.id) {
+            const opt = document.createElement('option');
+            opt.value = String(idx);
+            opt.textContent = `${pad2(idx + 1)}. ${p.nameZh}（${p.dynasty}・${p.yearsText}）`;
+            group.appendChild(opt);
+          }
+        });
+        elSelect.appendChild(group);
+      });
+      elSelect.addEventListener('change', (e) => {
+        goToScene(Number(e.target.value), { scroll: true });
+      });
+    }
+
+    function initTimeline() {
+      elTimelineRibbon.innerHTML = '';
+      elTimelineLegend.innerHTML = '';
+      ERAS.forEach(era => {
+        const count = PHARAOHS.filter(p => p.eraId === era.id).length;
+        const seg = document.createElement('button');
+        seg.type = 'button';
+        seg.style.flex = String(count);
+        seg.style.backgroundColor = era.color;
+        seg.title = `${era.code}｜${era.label}（${era.span}）`;
+        seg.className = 'h-full text-[11px] font-bold text-white/95 hover:brightness-110 transition truncate px-1 border-r border-white/25 last:border-r-0';
+        seg.textContent = era.code;
+        seg.addEventListener('click', () => {
+          const idx = PHARAOHS.findIndex(p => p.eraId === era.id);
+          if (idx !== -1) goToScene(idx, { scroll: true });
+        });
+        elTimelineRibbon.appendChild(seg);
+
+        const leg = document.createElement('span');
+        leg.className = 'inline-flex items-center gap-1.5';
+        leg.innerHTML = `<span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:${era.color}"></span>${era.code} ${era.label}`;
+        elTimelineLegend.appendChild(leg);
+      });
+
+      elTimelineSlider.max = String(PHARAOHS.length - 1);
+      elTimelineSlider.addEventListener('input', (e) => {
+        goToScene(Number(e.target.value), { scroll: false });
+      });
+    }
+
+    function renderSparklines() {
+      const activeIdx = state.currentIndex;
+      const pActive = PHARAOHS[activeIdx];
+      elSparkReignLabel.textContent = `約 ${pActive.reignYears} 年`;
+      elSparkYearLabel.textContent = pActive.yearsText;
+
+      // 1. Reign Length Sparkline
+      const svgReign = d3.select('#sparkline-reign');
+      svgReign.selectAll('*').remove();
+      const w = 360, h = 64, padX = 14, padY = 10;
+      const xScale = d3.scaleLinear().domain([0, PHARAOHS.length - 1]).range([padX, w - padX]);
+      const maxReign = d3.max(PHARAOHS, d => d.reignYears) || 70;
+      const yScale = d3.scaleLinear().domain([0, maxReign]).range([h - padY, padY]);
+
+      const area = d3.area()
+        .x((d, i) => xScale(i))
+        .y0(h - padY)
+        .y1(d => yScale(d.reignYears))
+        .curve(d3.curveMonotoneX);
+
+      const line = d3.line()
+        .x((d, i) => xScale(i))
+        .y(d => yScale(d.reignYears))
+        .curve(d3.curveMonotoneX);
+
+      svgReign.append('path')
+        .datum(PHARAOHS)
+        .attr('d', area)
+        .attr('fill', 'rgba(197, 150, 59, 0.18)');
+
+      svgReign.append('path')
+        .datum(PHARAOHS)
+        .attr('d', line)
+        .attr('fill', 'none')
+        .attr('stroke', '#C5963B')
+        .attr('stroke-width', 2);
+
+      svgReign.selectAll('circle')
+        .data(PHARAOHS)
+        .enter()
+        .append('circle')
+        .attr('class', 'spark-dot')
+        .attr('cx', (d, i) => xScale(i))
+        .attr('cy', d => yScale(d.reignYears))
+        .attr('r', (d, i) => i === activeIdx ? 5.5 : 3)
+        .attr('fill', (d, i) => i === activeIdx ? '#A63A2B' : '#15294A')
+        .attr('stroke', '#FFFFFF')
+        .attr('stroke-width', (d, i) => i === activeIdx ? 2 : 1)
+        .on('click', (event, d) => {
+          const idx = PHARAOHS.findIndex(item => item.id === d.id);
+          if (idx !== -1) goToScene(idx, { scroll: true });
+        })
+        .append('title')
+        .text(d => `${d.nameZh}：約 ${d.reignYears} 年`);
+
+      // 2. 3,000-Year Chronological Position Sparkline
+      const svgEra = d3.select('#sparkline-era');
+      svgEra.selectAll('*').remove();
+      const h2 = 56;
+      const xBce = d3.scaleLinear().domain([3200, 0]).range([padX, w - padX]);
+
+      svgEra.append('line')
+        .attr('x1', padX).attr('x2', w - padX)
+        .attr('y1', h2 / 2).attr('y2', h2 / 2)
+        .attr('stroke', '#D8CCB8').attr('stroke-width', 3).attr('stroke-linecap', 'round');
+
+      svgEra.append('line')
+        .attr('x1', padX).attr('x2', xBce(pActive.startBce))
+        .attr('y1', h2 / 2).attr('y2', h2 / 2)
+        .attr('stroke', '#15294A').attr('stroke-width', 3).attr('stroke-linecap', 'round');
+
+      svgEra.selectAll('circle')
+        .data(PHARAOHS)
+        .enter()
+        .append('circle')
+        .attr('class', 'spark-dot')
+        .attr('cx', d => xBce(d.startBce))
+        .attr('cy', h2 / 2)
+        .attr('r', (d, i) => i === activeIdx ? 6 : 3.2)
+        .attr('fill', (d, i) => i === activeIdx ? '#A63A2B' : getEraById(d.eraId).color)
+        .attr('stroke', '#FFFFFF')
+        .attr('stroke-width', (d, i) => i === activeIdx ? 2 : 1)
+        .on('click', (event, d) => {
+          const idx = PHARAOHS.findIndex(item => item.id === d.id);
+          if (idx !== -1) goToScene(idx, { scroll: true });
+        })
+        .append('title')
+        .text(d => `${d.nameZh}（${d.yearsText}）`);
+
+      // Year axis ticks
+      [3000, 2000, 1000, 30].forEach(yr => {
+        svgEra.append('text')
+          .attr('x', xBce(yr))
+          .attr('y', h2 - 5)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '9')
+          .attr('fill', '#6B7280')
+          .text(`${yr} BCE`);
+      });
+    }
+
+    // D3 + TopoJSON Interactive Egypt & Near East Vector Map
+    async function loadWorldAtlas() {
+      try {
+        const res = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json');
+        if (!res.ok) throw new Error('Atlas load failed');
+        state.worldTopo = await res.json();
+      } catch (err) {
+        state.worldTopo = null;
+      }
+      renderMap();
+    }
+
+    function renderMap() {
+      const p = PHARAOHS[state.currentIndex];
+      const cfg = p.map[state.mapMode] || p.map.peak;
+
+      elMapSubtitle.textContent = cfg.subtitle;
+      elMapNote.textContent = cfg.note;
+
+      // Update Toggle Buttons
+      if (state.mapMode === 'start') {
+        elBtnMapStart.className = 'px-2.5 py-1 rounded font-semibold bg-[#15294A] text-white transition';
+        elBtnMapPeak.className = 'px-2.5 py-1 rounded font-medium text-[#57606F] hover:text-[#15294A] transition';
+      } else {
+        elBtnMapPeak.className = 'px-2.5 py-1 rounded font-semibold bg-[#15294A] text-white transition';
+        elBtnMapStart.className = 'px-2.5 py-1 rounded font-medium text-[#57606F] hover:text-[#15294A] transition';
+      }
+
+      const wrap = document.getElementById('egypt-map-wrap');
+      const width = wrap.clientWidth || 420;
+      const height = wrap.clientHeight || 320;
+      const svg = d3.select('#egypt-map-svg');
+      svg.selectAll('*').remove();
+      svg.attr('viewBox', `0 0 ${width} ${height}`);
+
+      const tooltip = document.getElementById('map-tooltip');
+
+      const projection = d3.geoMercator()
+        .center([32.5, 26.8])
+        .scale(width * 2.25)
+        .translate([width * 0.48, height * 0.56]);
+
+      const pathGen = d3.geoPath().projection(projection);
+
+      // Sea backdrop gradient
+      const defs = svg.append('defs');
+      const seaGrad = defs.append('linearGradient').attr('id', 'seaGrad').attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+      seaGrad.append('stop').attr('offset', '0%').attr('stop-color', '#C9DFEE');
+      seaGrad.append('stop').attr('offset', '100%').attr('stop-color', '#E2EDF5');
+
+      svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'url(#seaGrad)');
+
+      if (state.worldTopo && typeof topojson !== 'undefined') {
+        const countries = topojson.feature(state.worldTopo, state.worldTopo.objects.countries).features;
+        svg.append('g')
+          .selectAll('path')
+          .data(countries)
+          .enter()
+          .append('path')
+          .attr('d', pathGen)
+          .attr('fill', d => {
+            const id = String(d.id).padStart(3, '0');
+            if (cfg.countries.includes(id)) return '#DFC07A';
+            if (cfg.influenceCountries.includes(id)) return '#EBD3B3';
+            return '#EFE8DA';
+          })
+          .attr('stroke', d => {
+            const id = String(d.id).padStart(3, '0');
+            if (cfg.countries.includes(id)) return '#9E7524';
+            if (cfg.influenceCountries.includes(id)) return '#B86B4B';
+            return '#CFC5B3';
+          })
+          .attr('stroke-width', d => {
+            const id = String(d.id).padStart(3, '0');
+            return cfg.countries.includes(id) ? 1.4 : 0.8;
+          });
+      } else {
+        svg.append('text')
+          .attr('x', width / 2)
+          .attr('y', 22)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '11')
+          .attr('fill', '#57606F')
+          .text('向量座標模式（底圖載入中或離線）');
+      }
+
+      // Nile river corridor line connecting verified river valley coordinates
+      const nileCoords = [
+        SITES.napata.coords,
+        SITES.abusimbel.coords,
+        SITES.thebes.coords,
+        SITES.abydos.coords,
+        SITES.amarna.coords,
+        SITES.memphis.coords,
+        SITES.delta.coords
+      ];
+      const nileGeo = { type: 'LineString', coordinates: nileCoords };
+      svg.append('path')
+        .datum(nileGeo)
+        .attr('d', pathGen)
+        .attr('fill', 'none')
+        .attr('stroke', '#3B82A6')
+        .attr('stroke-width', 2.4)
+        .attr('stroke-linecap', 'round')
+        .attr('opacity', 0.78);
+
+      // Campaign / Trade / Axis Arcs
+      const arcGroup = svg.append('g');
+      (cfg.arcs || []).forEach(([fromKey, toKey]) => {
+        const s1 = SITES[fromKey], s2 = SITES[toKey];
+        if (!s1 || !s2) return;
+        const p1 = projection(s1.coords);
+        const p2 = projection(s2.coords);
+        if (!p1 || !p2) return;
+        const mx = (p1[0] + p2[0]) / 2 + (p1[1] - p2[1]) * 0.14;
+        const my = (p1[1] + p2[1]) / 2 + (p2[0] - p1[0]) * 0.14;
+        arcGroup.append('path')
+          .attr('d', `M${p1[0]},${p1[1]} Q${mx},${my} ${p2[0]},${p2[1]}`)
+          .attr('fill', 'none')
+          .attr('stroke', '#A63A2B')
+          .attr('stroke-width', 2)
+          .attr('stroke-dasharray', '5,3')
+          .attr('opacity', 0.85);
+      });
+
+      // Site Markers
+      const markerGroup = svg.append('g');
+      (cfg.sites || []).forEach(key => {
+        const site = SITES[key];
+        if (!site) return;
+        const pt = projection(site.coords);
+        if (!pt) return;
+        const isCapital = key === cfg.capitalSite;
+
+        const g = markerGroup.append('g')
+          .attr('transform', `translate(${pt[0]}, ${pt[1]})`)
+          .style('cursor', 'pointer');
+
+        if (isCapital) {
+          g.append('circle')
+            .attr('r', 10)
+            .attr('fill', 'rgba(166, 58, 43, 0.22)');
+        }
+
+        g.append('circle')
+          .attr('r', isCapital ? 5.5 : 4.2)
+          .attr('fill', isCapital ? '#A63A2B' : '#15294A')
+          .attr('stroke', '#FFFFFF')
+          .attr('stroke-width', 1.6);
+
+        g.append('text')
+          .attr('x', 8)
+          .attr('y', 4)
+          .attr('font-size', isCapital ? '11.5' : '10.5')
+          .attr('font-weight', isCapital ? '700' : '600')
+          .attr('fill', '#15294A')
+          .attr('paint-order', 'stroke')
+          .attr('stroke', '#FAF6EE')
+          .attr('stroke-width', 3)
+          .text(isCapital ? `★ ${site.short}` : site.short);
+
+        g.on('mouseenter', () => {
+          tooltip.innerHTML = `<div class="font-bold text-[#E8D5A7]">${site.name}</div><div class="mt-0.5">${site.desc}</div>`;
+          tooltip.style.opacity = '1';
+          const left = Math.min(width - 215, Math.max(8, pt[0] + 12));
+          const top = Math.max(8, pt[1] - 42);
+          tooltip.style.left = `${left}px`;
+          tooltip.style.top = `${top}px`;
+        }).on('mouseleave', () => {
+          tooltip.style.opacity = '0';
+        });
+      });
+
+      // Geographic labels
+      const seaLabels = [
+        { text: '地中海', coords: [28.8, 32.8] },
+        { text: '紅海',   coords: [36.2, 24.0] }
+      ];
+      seaLabels.forEach(lbl => {
+        const pt = projection(lbl.coords);
+        if (!pt) return;
+        svg.append('text')
+          .attr('x', pt[0]).attr('y', pt[1])
+          .attr('font-size', '10.5')
+          .attr('font-style', 'italic')
+          .attr('fill', '#4A6E8A')
+          .attr('letter-spacing', '2')
+          .text(lbl.text);
+      });
+    }
+
+    function renderThematicSection() {
+      // Filter pills
+      elThemeFilterBar.innerHTML = '';
+      const allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = `theme-pill text-xs sm:text-sm px-3 py-1.5 rounded-full border border-[#D8CCB8] bg-[#FAF6EE] text-[#15294A] font-medium ${state.activeTheme === 'all' ? 'active' : ''}`;
+      allBtn.textContent = `全部 (${PHARAOHS.length})`;
+      allBtn.addEventListener('click', () => {
+        state.activeTheme = 'all';
+        renderThematicSection();
+      });
+      elThemeFilterBar.appendChild(allBtn);
+
+      THEMES.forEach(t => {
+        const count = PHARAOHS.filter(p => p.themes.includes(t.id)).length;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `theme-pill text-xs sm:text-sm px-3 py-1.5 rounded-full border border-[#D8CCB8] bg-[#FAF6EE] text-[#15294A] font-medium ${state.activeTheme === t.id ? 'active' : ''}`;
+        btn.textContent = `${t.label} (${count})`;
+        btn.addEventListener('click', () => {
+          state.activeTheme = t.id;
+          renderThematicSection();
+        });
+        elThemeFilterBar.appendChild(btn);
+      });
+
+      // Matching cards
+      const matches = PHARAOHS.map((p, idx) => ({ p, idx }))
+        .filter(({ p }) => state.activeTheme === 'all' || p.themes.includes(state.activeTheme));
+
+      elThemeCardsGrid.innerHTML = '';
+      matches.forEach(({ p, idx }) => {
+        const isActive = idx === state.currentIndex;
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `text-left p-3.5 rounded-lg border transition ${
+          isActive
+            ? 'bg-[#15294A] text-white border-[#15294A] shadow-md'
+            : 'bg-[#FCF9F3] hover:bg-[#F3ECE0] text-[#1F2937] border-[#E5DCCB]'
+        }`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-2 text-[11px] ${isActive ? 'text-[#E8D5A7]' : 'text-[#7A5415]'} font-mono font-semibold">
+            <span>${pad2(idx + 1)}｜${p.dynasty}</span>
+            <span>${p.yearsText}</span>
+          </div>
+          <div class="font-serif-display font-bold text-base mt-1 ${isActive ? 'text-white' : 'text-[#15294A]'}">
+            ${p.nameZh} <span class="text-xs font-normal opacity-75">${p.nameEn}</span>
+          </div>
+          <p class="text-xs mt-1.5 line-clamp-2 leading-relaxed ${isActive ? 'text-slate-200' : 'text-[#57606F]'}">
+            ${p.turningPoint}
+          </p>
+        `;
+        card.addEventListener('click', () => {
+          goToScene(idx, { scroll: true });
+        });
+        elThemeCardsGrid.appendChild(card);
+      });
+    }
+
+    function navigateWithinTheme(delta) {
+      const matchingIndices = PHARAOHS
+        .map((p, idx) => ({ p, idx }))
+        .filter(({ p }) => state.activeTheme === 'all' || p.themes.includes(state.activeTheme))
+        .map(({ idx }) => idx);
+
+      if (matchingIndices.length === 0) return;
+      const pos = matchingIndices.indexOf(state.currentIndex);
+      if (pos === -1) {
+        goToScene(matchingIndices[0], { scroll: true });
+      } else {
+        const nextPos = (pos + delta + matchingIndices.length) % matchingIndices.length;
+        goToScene(matchingIndices[nextPos], { scroll: true });
+      }
+    }
+
+    function renderAll() {
+      const idx = state.currentIndex;
+      const p = PHARAOHS[idx];
+      const era = getEraById(p.eraId);
+
+      // Era tabs active state
+      elEraTabs.querySelectorAll('.era-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.eraId === p.eraId);
+      });
+
+      // Selector & counters
+      elSelect.value = String(idx);
+      elCounter.textContent = `${pad2(idx + 1)} / ${pad2(PHARAOHS.length)}`;
+      elTimelineSlider.value = String(idx);
+      elTimelineActiveLabel.textContent = `${pad2(idx + 1)} / ${PHARAOHS.length}｜${p.nameZh}（${p.yearsText}）`;
+      elBarCurrentTitle.textContent = `${pad2(idx + 1)}. ${p.nameZh}（${p.dynasty}・${p.yearsText}）`;
+
+      // Stage Header
+      elWatermark.textContent = p.numLabel;
+      elEraBadge.textContent = `${era.code}｜${era.label}`;
+      elDynastyBadge.textContent = p.dynasty;
+      elYears.textContent = p.yearsText;
+      elNameZh.textContent = p.nameZh;
+      elNameEn.textContent = p.nameEn;
+      elEpithet.textContent = p.epithet;
+
+      // Archival Illustration Plate
+      elPlateImg.src = p.plateImg;
+      elPlateImg.alt = `${p.nameZh}時代歷史意象圖版`;
+      elPlateCaption.textContent = p.plateCaption;
+
+      // Stats
+      elStatCapital.textContent = p.capital;
+      elStatDuration.textContent = `約 ${p.reignYears} 年`;
+
+      // Turning Point & Clickable Theme Pills
+      elTurningPoint.textContent = p.turningPoint;
+      elStageThemeTags.innerHTML = '';
+      p.themes.forEach(tid => {
+        const t = getThemeById(tid);
+        if (!t) return;
+        const tag = document.createElement('button');
+        tag.type = 'button';
+        tag.className = 'text-xs px-2.5 py-1 rounded-full bg-[#FAF6EE] hover:bg-[#15294A] hover:text-white text-[#15294A] border border-[#D8CCB8] transition font-medium';
+        tag.textContent = `# ${t.label}`;
+        tag.addEventListener('click', () => {
+          state.activeTheme = tid;
+          renderThematicSection();
+          const sec = document.getElementById('thematic-section');
+          if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        elStageThemeTags.appendChild(tag);
+      });
+
+      // 3-Part Narrative
+      elInherited.textContent = p.inherited;
+      elChoices.textContent = p.choices;
+      elLegacy.textContent = p.legacy;
+
+      // Quote
+      elQuoteZh.textContent = p.quoteZh;
+      elQuoteEn.textContent = p.quoteEn;
+      elQuoteSourceTitle.textContent = p.quoteSource;
+      elQuoteSourceLink.href = p.quoteUrl;
+
+      // 3 Milestones
+      elMilestones.innerHTML = '';
+      p.milestones.forEach(m => {
+        const row = document.createElement('div');
+        row.className = 'flex items-start gap-3 p-3 rounded-lg bg-[#FAF6EE] border border-[#E5DCCB]';
+        row.innerHTML = `
+          <span class="shrink-0 font-mono text-xs font-bold text-[#A63A2B] bg-white px-2 py-1 rounded border border-[#E5DCCB] min-w-[96px] text-center">${m.year}</span>
+          <p class="text-xs sm:text-sm text-[#374151] leading-relaxed">${m.text}</p>
+        `;
+        elMilestones.appendChild(row);
+      });
+
+      // Links
+      elLinks.innerHTML = '';
+      p.links.forEach(lnk => {
+        const a = document.createElement('a');
+        a.href = lnk.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'text-xs sm:text-sm px-3 py-1.5 rounded-md bg-[#FAF6EE] hover:bg-[#15294A] hover:text-white text-[#15294A] border border-[#D8CCB8] transition font-medium';
+        a.textContent = `${lnk.title} ↗`;
+        elLinks.appendChild(a);
+      });
+
+      renderMap();
+      renderSparklines();
+      renderThematicSection();
+    }
+
+    // Lightbox Controls
+    function openLightbox() {
+      const p = PHARAOHS[state.currentIndex];
+      elLightboxTitle.textContent = `${p.nameZh}（${p.dynasty}・${p.yearsText}）`;
+      elLightboxImg.src = p.plateImg;
+      elLightboxImg.alt = p.plateCaption;
+      elLightboxCaption.textContent = p.plateCaption;
+      elLightboxModal.classList.remove('hidden');
+      elLightboxModal.classList.add('flex');
+    }
+
+    function closeLightbox() {
+      elLightboxModal.classList.add('hidden');
+      elLightboxModal.classList.remove('flex');
+    }
+
+    // Event Listeners
+    document.getElementById('btn-jump-timeline').addEventListener('click', () => {
+      document.getElementById('timeline-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('btn-jump-themes').addEventListener('click', () => {
+      document.getElementById('thematic-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    elBtnMapStart.addEventListener('click', () => {
+      state.mapMode = 'start';
+      renderMap();
+    });
+
+    elBtnMapPeak.addEventListener('click', () => {
+      state.mapMode = 'peak';
+      renderMap();
+    });
+
+    document.getElementById('btn-prev').addEventListener('click', () => {
+      goToScene(state.currentIndex - 1, { scroll: true });
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      goToScene(state.currentIndex + 1, { scroll: true });
+    });
+
+    elBtnPlay.addEventListener('click', () => {
+      if (state.isPlaying) {
+        stopPlayback();
+      } else {
+        startPlayback();
+      }
+    });
+
+    elPlaybackSpeed.addEventListener('change', (e) => {
+      state.speed = e.target.value;
+      if (state.isPlaying) {
+        startPlayback();
+      }
+    });
+
+    document.getElementById('btn-theme-prev').addEventListener('click', () => navigateWithinTheme(-1));
+    document.getElementById('btn-theme-next').addEventListener('click', () => navigateWithinTheme(1));
+
+    const plateContainer = document.getElementById('plate-container');
+    plateContainer.addEventListener('click', openLightbox);
+    plateContainer.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLightbox();
+      }
+    });
+
+    document.getElementById('btn-close-lightbox').addEventListener('click', closeLightbox);
+    elLightboxModal.addEventListener('click', (e) => {
+      if (e.target === elLightboxModal) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        return;
+      }
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+      if (e.key === 'ArrowLeft') {
+        goToScene(state.currentIndex - 1, { scroll: true });
+      } else if (e.key === 'ArrowRight') {
+        goToScene(state.currentIndex + 1, { scroll: true });
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      renderMap();
+    });
+
+    // Initialize
+    initEraTabs();
+    initSelectDropdown();
+    initTimeline();
+    renderAll();
+    loadWorldAtlas();
+  </script>
+</body>
+</html>
