@@ -1,12 +1,35 @@
 (() => {
+  const photos = {
+    narmer: ["d/d7", "Chambers_B17_and_B18_(Umm_el-Qa'ab).jpg", "Oesermaatra0069（推定）", "PD", "烏姆卡伯 B17／B18 墓室現況", 330],
+    djoser: ["8/82", "Step_Pyramid_of_Djoser.jpg", "Dr. Ondřej Havelka", "by-sa/4.0", "薩卡拉階梯金字塔", 960],
+    khufu: ["e/e7", "Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg", "Douwe C. van der Zee", "by-sa/4.0", "吉薩古夫大金字塔", 960],
+    pepi2: ["4/44", "PepiIIPyramid.jpg", "Jon Bodsworth", "free", "南薩卡拉佩皮二世金字塔遺址", 330],
+    mentuhotep2: ["7/74", "Mortuary_Temple_of_Mentuhotep_II_from_the_Mortuary_Temple_of_Hatshepsut,_Luxor,_LG,_EGY_(48010482218).jpg", "Warren LeMay", "CC0", "從哈特謝普蘇特祭殿看門圖霍特普二世祭殿遺址", 960],
+    senusret3: ["5/56", "Piramide-senusret3.png", "Jolle~commonswiki（推定）", "by-sa/3.0", "達舒爾的辛努塞爾特三世金字塔", 0],
+    ahmose1: ["c/cc", "Pyramid_of_Ahmose,_Abydos,_1998.png", "Wannabe Egyptologist", "by-sa/3.0", "阿拜多斯金字塔遺址，1998 年", 0],
+    hatshepsut: ["7/7f", "Hatshepsut_Temple.jpg", "James G. Howes", "free", "代爾巴哈里峭壁下的哈特謝普蘇特祭殿", 960],
+    thutmose3: ["7/7f", "Egypt.KV34.01.jpg", "Hajor", "by-sa/3.0", "帝王谷 KV34，圖特摩斯三世墓", 0],
+    akhenaten: ["e/e1", "Defaced_relief_of_Akhenaten_and_Nefertiti_from_Akhenaten’s_Royal_Tomb.jpg", "Bruce Allardice", "by-sa/2.0", "阿瑪納皇家墓內的阿頓祭祀浮雕", 960],
+    tutankhamun: ["0/0e", "Tutankhamun_KV62_burial_chamber_and_sarcophagus.jpg", "Romagy", "by-sa/4.0", "帝王谷 KV62 的石棺與壁畫", 960],
+    ramesses2: ["8/8b", "Flickr_-_archer10_(Dennis)_-_Egypt-4A-023.jpg", "Dennis G. Jarvis", "by-sa/2.0", "帝王谷 KV7 墓內第四道走廊入口", 960],
+    ramesses3: ["9/92", "KV11_Tomb_of_Ramses_III_DSCF3105.jpg", "R Prazeres", "by-sa/4.0", "帝王谷 KV11，拉美西斯三世墓入口", 960],
+    piye: ["5/50", "Al-Kurru,main_pyramid.jpg", "Bertramz", "by/3.0", "庫魯王室墓區環境照，圖中為墓區其他遺構", 960],
+    psamtik1: ["7/7f", "Jean-Francois_Champollion_-_Plan_Des_Ruines_De_Sais.cropped.png", "Jean-François Champollion", "PD", "塞易斯遺址歷史平面圖", 960],
+    ptolemy1: ["7/75", "Kom_el-Dikka,_Alexandria.jpg", "Abdelrhman 1990", "by/4.0", "亞歷山卓古城區現況，可見較晚期的羅馬劇場", 960],
+    nubia: ["e/e6", "Abu_Simbel,_façade_of_the_Great_Temple_(6201194723).jpg", "Arian Zwegers", "by/2.0", "阿布辛貝大神廟與岩壁巨像", 960],
+    delta: ["f/f5", "Satellite_picture_of_the_Nile_Delta,_Egypt.jpg", "NASA", "PD", "尼羅河三角洲衛星影像", 960],
+    qurn: ["b/b0", "Égypte,_Vallée_des_Rois,_Nécropole_thébaine,_El-Qurn_(la_Corne)_montagne_pyramidale_dominant_la_vallée_(49835131552).jpg", "Marie Thérèse Hébert & Jean Robert Thibault", "by-sa/2.0", "古爾恩山峰與帝王谷", 960],
+    barkal: ["4/4e", "Gebel_Barkal.jpg", "LassiHU", "by-sa/4.0", "巴爾卡爾山與努比亞地形", 960]
+  };
+
   const regions = {
-    delta: { label: '尼羅河三角洲', overview: [30.28, 31.13], caption: '亞歷山卓港與塞易斯古都', frame: [29.62, 30.97, 30.71, 31.38] },
-    pyramids: { label: '吉薩與薩卡拉', overview: [31.14, 29.93], caption: '從階梯金字塔到吉薩大金字塔', frame: [31.02, 31.34, 29.76, 30.04] },
-    amarna: { label: '阿瑪納', overview: [30.9852, 27.6262], caption: '阿肯那頓的新都與皇家谷地', frame: [30.84, 31.035, 27.575, 27.735] },
-    abydos: { label: '阿拜多斯', overview: [31.924, 26.176], caption: '早王朝陵墓與新王國金字塔遺址', frame: [31.885, 31.961, 26.143, 26.215] },
-    thebes: { label: '底比斯與帝王谷', overview: [32.602, 25.74], caption: '山峰、岩窟墓與西岸祭殿', frame: [32.592, 32.613, 25.729, 25.748] },
-    nubia: { label: '阿布辛貝', overview: [31.6256, 22.3369], caption: '納瑟湖畔的拉美西斯二世岩窟神廟', frame: [31.57, 31.68, 22.285, 22.389] },
-    kush: { label: '庫魯・今日蘇丹', overview: [31.77093, 18.40947], caption: '庫施王室金字塔墓區', frame: [31.733, 31.816, 18.364, 18.455] }
+    delta: { photo: 'delta', label: '尼羅河三角洲', overview: [30.28, 31.13], caption: '亞歷山卓港與塞易斯古都', frame: [29.62, 30.97, 30.71, 31.38] },
+    pyramids: { photo: 'khufu', label: '吉薩與薩卡拉', overview: [31.14, 29.93], caption: '從階梯金字塔到吉薩大金字塔', frame: [31.02, 31.34, 29.76, 30.04] },
+    amarna: { photo: 'akhenaten', label: '阿瑪納', overview: [30.9852, 27.6262], caption: '阿肯那頓的新都與皇家谷地', frame: [30.84, 31.035, 27.575, 27.735] },
+    abydos: { photo: 'ahmose1', label: '阿拜多斯', overview: [31.924, 26.176], caption: '早王朝陵墓與新王國金字塔遺址', frame: [31.885, 31.961, 26.143, 26.215] },
+    thebes: { photo: 'qurn', label: '底比斯與帝王谷', overview: [32.602, 25.74], caption: '山峰、岩窟墓與西岸祭殿', frame: [32.592, 32.613, 25.729, 25.748] },
+    nubia: { photo: 'nubia', label: '阿布辛貝', overview: [31.6256, 22.3369], caption: '納瑟湖畔的拉美西斯二世岩窟神廟', frame: [31.57, 31.68, 22.285, 22.389] },
+    kush: { photo: 'piye', label: '庫魯・今日蘇丹', overview: [31.77093, 18.40947], caption: '庫施王室金字塔墓區', frame: [31.728, 31.855, 18.345, 18.572] }
   };
 
   const types = {
@@ -17,16 +40,16 @@
   // Representative entrance or complex centroid, in [longitude, latitude].
   const sites = [
     { chapters: ['narmer'], region: 'abydos', coords: [31.90799, 26.17584], type: 'ruin', name: '烏姆卡伯 B17／B18', note: '一般認為這兩間墓室屬於那爾邁。', source: 'https://vici.org/vici/50389/?lang=en' },
-    { chapters: ['djoser'], region: 'pyramids', coords: [31.2167, 29.8711], type: 'pyramid', name: '左塞爾階梯金字塔', note: '六層階梯矗立在薩卡拉墓區。', source: 'https://egymonuments.gov.eg/en/monuments/the-step-pyramid-complex-of-djoser/', photo: ['8/82', 'Step_Pyramid_of_Djoser.jpg', 'Dr. Ondřej Havelka', 'by-sa/4.0'] },
-    { chapters: ['khufu'], region: 'pyramids', coords: [31.1342, 29.9792], type: 'pyramid', name: '古夫大金字塔', note: '吉薩三座主要金字塔中，古夫的大金字塔位於最北。', source: 'https://egymonuments.gov.eg/monuments/the-great-pyramid/', photo: ['e/e7', 'Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg', 'Douwe C. van der Zee', 'by-sa/4.0'] },
+    { chapters: ['djoser'], region: 'pyramids', coords: [31.2167, 29.8711], type: 'pyramid', name: '左塞爾階梯金字塔', note: '六層階梯矗立在薩卡拉墓區。', source: 'https://egymonuments.gov.eg/en/monuments/the-step-pyramid-complex-of-djoser/' },
+    { chapters: ['khufu'], region: 'pyramids', coords: [31.1342, 29.9792], type: 'pyramid', name: '古夫大金字塔', note: '吉薩三座主要金字塔中，古夫的大金字塔位於最北。', source: 'https://egymonuments.gov.eg/monuments/the-great-pyramid/' },
     { chapters: ['pepi2'], region: 'pyramids', coords: [31.2167, 29.8333], type: 'pyramid', name: '南薩卡拉佩皮二世金字塔', note: '金字塔與周邊祭祀建築現為遺址。', source: 'https://aebc.ff.cuni.cz/database/207_saq_s/' },
     { chapters: ['mentuhotep2'], region: 'thebes', coords: [32.60611, 25.73736], type: 'temple', name: '門圖霍特普二世祭殿', note: '坐落在代爾巴哈里峭壁下，緊鄰後來的哈特謝普蘇特祭殿。', source: 'https://egyptartefacts.griffith.ox.ac.uk/node/1074/' },
     { chapters: ['senusret3'], region: 'pyramids', coords: [31.2256, 29.8189], type: 'pyramid', name: '達舒爾辛努塞爾特三世金字塔', note: '泥磚塔心現已崩塌成丘。法老本人可能葬於阿拜多斯。', source: 'https://www.metmuseum.org/essays/the-pyramid-complex-of-senwosret-iii-in-the-cemeteries-of-dahshur' },
     { chapters: ['ahmose1'], region: 'abydos', coords: [31.9378, 26.1757], type: 'pyramid', name: '雅赫摩斯一世金字塔遺址', note: '阿拜多斯的王室祭祀建築群。他是否葬於這裡仍有疑問。', source: 'https://archive.archaeology.org/0107/abstracts/abydos.html' },
-    { chapters: ['hatshepsut'], region: 'thebes', coords: [32.60658, 25.73828], type: 'temple', name: '哈特謝普蘇特祭殿', note: '峭壁下的階台是祭殿。她的陵墓入口位於帝王谷 KV20。', source: 'https://egymonuments.gov.eg/monuments/hatshepsut-temple/', photo: ['7/7f', 'Hatshepsut_Temple.jpg', 'James G. Howes'] },
+    { chapters: ['hatshepsut'], region: 'thebes', coords: [32.60658, 25.73828], type: 'temple', name: '哈特謝普蘇特祭殿', note: '峭壁下的階台是祭殿。她的陵墓入口位於帝王谷 KV20。', source: 'https://egymonuments.gov.eg/monuments/hatshepsut-temple/' },
     { chapters: ['thutmose3'], region: 'thebes', coords: [32.60064, 25.73819], type: 'tomb', name: '圖特摩斯三世墓 KV34', note: '入口位在帝王谷南側的狹窄岩隙中。', source: 'https://en.wikipedia.org/wiki/KV34' },
     { chapters: ['akhenaten'], region: 'amarna', coords: [30.9852, 27.6262], type: 'tomb', name: '阿瑪納皇家墓 26 號', note: '入口藏在阿瑪納古城東側的皇家谷地。', source: 'https://www.amarnaproject.com/amarna-the-place/royal-tomb/' },
-    { chapters: ['tutankhamun'], region: 'thebes', coords: [32.60150, 25.74020], type: 'tomb', name: '圖坦卡門墓 KV62', note: '墓室不大，彩繪集中在埋葬室的牆面。', source: 'https://egymonuments.gov.eg/monuments/tomb-of-tutankhamun/', photo: ['0/0e', 'Tutankhamun_KV62_burial_chamber_and_sarcophagus.jpg', 'Romagy', 'by-sa/4.0'] },
+    { chapters: ['tutankhamun'], region: 'thebes', coords: [32.60150, 25.74020], type: 'tomb', name: '圖坦卡門墓 KV62', note: '墓室不大，彩繪集中在埋葬室的牆面。', source: 'https://egymonuments.gov.eg/monuments/tomb-of-tutankhamun/' },
     { chapters: ['ramesses2'], region: 'thebes', coords: [32.60166, 25.74074], type: 'tomb', name: '拉美西斯二世墓 KV7', note: '神廟位於更南方的阿布辛貝。岩窟墓則在帝王谷。', source: 'https://en.wikipedia.org/wiki/KV7' },
     { chapters: ['ramesses3'], region: 'thebes', coords: [32.60125, 25.74000], type: 'tomb', name: '拉美西斯三世墓 KV11', note: '墓道開鑿於帝王谷的岩層，與他在梅迪奈特哈布的祭殿分處兩地。', source: 'https://vici.org/vici/45243/' },
     { chapters: ['piye'], region: 'kush', coords: [31.77093, 18.40947], type: 'pyramid', name: '庫魯皮耶墓 Ku 17', note: '位於今日蘇丹。原有金字塔上部已不存。', source: 'https://vici.org/vici/21588/?lang=en' },
@@ -44,8 +67,8 @@
   const deltaWest = [[31.22,30.07],[31.11,30.40],[30.90,30.69],[30.77,30.98],[30.49,31.22],[30.40,31.42]];
   const deltaEast = [[31.22,30.07],[31.27,30.38],[31.43,30.68],[31.61,31.03],[31.80,31.43]];
   const mountains = [
-    { coords: [32.59604,25.73642], name: '古爾恩山峰' },
-    { coords: [31.8283,18.5367], name: '巴爾卡爾山' }
+    { coords: [32.59604,25.73642], name: '古爾恩山峰', photo: 'qurn' },
+    { coords: [31.8283,18.5367], name: '巴爾卡爾山', photo: 'barkal' }
   ];
 
   const el = id => document.getElementById(id);
@@ -67,18 +90,16 @@
     const waterways = [nile, deltaWest, deltaEast].map(points => pathFor(points, frame)).join(' ');
     const mountainMarks = mountains.map(mountain => {
       const [x, y] = project(mountain.coords, frame);
-      if (x < 15 || x > W - 15 || y < 25 || y > H - 20) return '';
-      const label = view.region ? '<text x="-16" y="29" text-anchor="start" fill="#493524" font-size="17">' + mountain.name + '</text>' : '';
-      return '<g transform="translate(' + x + ' ' + y + ')"><path d="M-26 9 L0 -35 L24 9Z" fill="#84624a" stroke="#523e30" stroke-width="2"/><path d="M0 -35 L8 9 H24Z" fill="#a87f55"/>' + label + '</g>';
+      if (!view.region || x < 15 || x > W - 15 || y < 25 || y > H - 20) return '';
+      return '<g transform="translate(' + x + ' ' + y + ')"><circle r="4" fill="#ffebb6" stroke="#473321" stroke-width="2"/><text y="22" text-anchor="middle" class="terrain-label" font-size="17">' + mountain.name + '</text></g>';
     }).join('');
-    const mapLabels = view.region ? '' : '<text x="230" y="32">地中海</text><text x="275" y="276" transform="rotate(-12 275 276)">埃及</text><text x="287" y="483">蘇丹</text><text x="196" y="356" fill="#2c514b">尼羅河</text>';
+    const mapLabels = view.region ? '' : '<text x="230" y="32">地中海</text><text x="275" y="276" transform="rotate(-12 275 276)">埃及</text><text x="287" y="483">蘇丹</text><text x="196" y="356">尼羅河</text>';
     el('adventure-terrain').innerHTML =
-      '<defs><linearGradient id="dune-sand" x2=".8" y2="1"><stop stop-color="#f5dda9"/><stop offset="1" stop-color="#d6aa72"/></linearGradient>' +
-      '<pattern id="dune-lines" width="135" height="98" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)"><path d="M-24 15 Q13 0 53 17 T137 17 M-13 41 Q26 26 62 43 T145 45 M-29 74 Q17 60 53 76 T140 79" fill="none" stroke="#9c663c" opacity=".18" stroke-width="1.5"/><circle cx="31" cy="54" r="1" fill="#a47143" opacity=".32"/><circle cx="101" cy="64" r="1.5" fill="#95653e" opacity=".20"/></pattern></defs>' +
-      '<rect width="480" height="530" fill="url(#dune-sand)"/><rect width="480" height="530" fill="url(#dune-lines)"/>' +
-      '<path d="' + sea + '" fill="#83aaa3" stroke="#587d78" stroke-width="2"/><path d="' + waterways + '" fill="none" stroke="#759065" stroke-opacity=".42" stroke-width="14" stroke-linejoin="round"/><path d="' + waterways + '" fill="none" stroke="#417c80" stroke-width="5" stroke-linejoin="round"/>' +
-      '<g fill="#62452f" font-size="20" font-weight="650">' + mapLabels + '</g>' + mountainMarks +
-      '<path d="M447 50l7-19 7 19-7-5z" fill="#644029"/><text x="454" y="25" text-anchor="middle" fill="#644029" font-size="15">北</text>';
+      '<defs><linearGradient id="ocean-shade" x2="0" y2="1"><stop stop-color="#17363a"/><stop offset="1" stop-color="#2a5955"/></linearGradient></defs>' +
+      '<rect width="480" height="530" fill="#2b1809" opacity=".09"/>' +
+      '<path d="' + sea + '" fill="url(#ocean-shade)" stroke="#c2976b" stroke-width="2"/><path d="' + waterways + '" fill="none" stroke="#798259" stroke-opacity=".68" stroke-width="15" stroke-linejoin="round"/><path d="' + waterways + '" fill="none" stroke="#22453f" stroke-width="6" stroke-linejoin="round"/><path d="' + waterways + '" fill="none" stroke="#68a397" stroke-width="3" stroke-linejoin="round"/>' +
+      '<g class="terrain-label" font-size="20" font-weight="650">' + mapLabels + '</g>' + mountainMarks +
+      '<path d="M447 50l7-19 7 19-7-5z" fill="#ffe6ab" stroke="#4e3120"/><text x="454" y="25" text-anchor="middle" class="terrain-label" font-size="15">北</text>';
   }
 
   function place(element, coords, frame) {
@@ -103,36 +124,87 @@
     city: '<path d="M3 25V12h6v-6h8v6h5v-3h9v16z" fill="#c68855"/><path d="M10 17v4m7-4v4m8-4v4" stroke="#fff0cd" stroke-width="2"/>'
   };
 
+  function photoUrl(photo, thumbnail = false) {
+    const [hash, filename, , , , fullWidth] = photo;
+    const name = encodeURIComponent(filename);
+    const width = fullWidth && (thumbnail ? 330 : fullWidth);
+    return width
+      ? 'https://thumb.wikimedia.org/wikipedia/commons/thumb/' + hash + '/' + name + '/' + width + 'px-' + name
+      : 'https://upload.wikimedia.org/wikipedia/commons/' + hash + '/' + name;
+  }
+
+  function photoPage(photo) {
+    return 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(photo[1]);
+  }
+
+  function addPhotoCredit(container, photo) {
+    const [, , author, license] = photo;
+    container.append(externalLink(photoPage(photo), author + '／Wikimedia Commons'));
+    if (license.startsWith('by')) {
+      container.append(' · ', externalLink('https://creativecommons.org/licenses/' + license + '/', 'CC ' + license.replace('/', ' ').toUpperCase()));
+    } else {
+      container.append(' · ' + ({ PD: '公有領域', CC0: 'CC0', free: '來源頁授權' })[license]);
+    }
+  }
+
+  function placeImage(container, photo, type) {
+    const fallback = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    fallback.setAttribute('viewBox', '0 0 34 28');
+    fallback.setAttribute('aria-hidden', 'true');
+    fallback.innerHTML = pinArt[type] || pinArt.ruin;
+    container.append(fallback);
+    if (!photo) return;
+    const image = document.createElement('img');
+    image.alt = '';
+    image.decoding = 'async';
+    image.style.display = 'none';
+    image.addEventListener('load', () => {
+      fallback.remove();
+      image.style.display = '';
+    }, { once: true });
+    image.addEventListener('error', () => image.remove(), { once: true });
+    image.src = photoUrl(photo, true);
+    container.append(image);
+  }
+
+  function addChoice({ code, title, subtitle, active, action, type, photo }) {
+    const choice = createElement('button', 'adventure-choice');
+    choice.type = 'button';
+    if (active) choice.setAttribute('aria-current', 'location');
+    const thumb = createElement('span', 'choice-image');
+    placeImage(thumb, photo, type);
+    thumb.append(createElement('span', 'adventure-code', code));
+    const details = document.createElement('span');
+    details.append(createElement('strong', '', title), createElement('small', '', subtitle));
+    const arrow = createElement('span', 'adventure-arrow', '›');
+    arrow.setAttribute('aria-hidden', 'true');
+    choice.append(thumb, details, arrow);
+    choice.addEventListener('click', action);
+    el('adventure-regions').append(choice);
+    return choice;
+  }
+
   function addControls(item) {
-    const { code, title, subtitle, coords, frame, active, action, type, pinCode = code } = item;
+    const { code, title, coords, frame, active, action, type, photo, pinCode = code, shift = 0 } = item;
     const pin = createElement('button', 'adventure-pin');
     pin.type = 'button';
     pin.setAttribute('aria-label', title);
     pin.setAttribute('aria-description', '地圖代號 ' + pinCode);
-    pin.dataset.type = type || 'region';
-    if (pinArt[type]) {
-      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      icon.setAttribute('viewBox', '0 0 34 28');
-      icon.setAttribute('aria-hidden', 'true');
-      icon.innerHTML = pinArt[type];
-      pin.append(icon);
+    if (active) pin.setAttribute('aria-current', 'location');
+    pin.style.setProperty('--pin-shift', shift + 'px');
+    const picture = createElement('span', 'pin-image');
+    placeImage(picture, photo, type);
+    pin.append(picture, createElement('span', 'pin-anchor'), createElement('span', 'pin-label', pinCode));
+    if (shift) {
+      const leader = createElement('span', 'pin-leader');
+      leader.style.width = Math.hypot(shift, 9) + 'px';
+      leader.style.transform = 'rotate(' + Math.atan2(-9, shift) + 'rad)';
+      pin.prepend(leader);
     }
-    pin.append(createElement('span', '', pinCode));
     place(pin, coords, frame);
-    const choice = createElement('button', 'adventure-choice');
-    choice.type = 'button';
-    const details = document.createElement('span');
-    details.append(createElement('strong', '', title), createElement('small', '', subtitle));
-    const arrow = createElement('span', '', '›');
-    arrow.setAttribute('aria-hidden', 'true');
-    choice.append(createElement('span', 'adventure-code', code), details, arrow);
-    for (const control of [pin, choice]) {
-      if (active) control.setAttribute('aria-current', 'location');
-      control.addEventListener('click', action);
-    }
+    pin.addEventListener('click', action);
     el('adventure-pins').append(pin);
-    el('adventure-regions').append(choice);
-    return choice;
+    addChoice(item);
   }
 
   const sceneNumber = index => String(index + 1).padStart(2, '0');
@@ -140,6 +212,9 @@
   function renderMap() {
     const region = regions[view.region];
     const frame = view.valley ? valleyFrame : region?.frame ?? overviewFrame;
+    el('adventure').dataset.scope = region ? 'detail' : 'overview';
+    el('adventure-directory-title').textContent = region ? '選擇遺跡' : '選擇地區';
+    const usedPhotos = new Set();
     const pins = el('adventure-pins');
     const choices = el('adventure-regions');
     pins.replaceChildren();
@@ -152,13 +227,15 @@
     el('adventure-context').textContent = view.valley ? '在谷地裡比較四座法老岩窟墓。' : region?.caption ?? '選擇地區，探索 17 幕故事。';
     el('adventure-map-note').textContent = region
       ? '數字是故事幕號。放大地圖仍使用相同幕號，相鄰入口可從地點清單選取。'
-      : 'A–G 是區域代號。進入區域後，數字代表故事幕號。河道與地形為簡化繪製。';
+      : 'A–G 是區域代號，小圖數字是故事幕號。河道為簡化繪製，沙漠底紋為場景插畫。';
     drawTerrain(frame);
 
     if (!region) {
       Object.entries(regions).forEach(([id, entry], i) => {
+        const photo = photos[entry.photo];
+        usedPhotos.add(photo);
         addControls({
-          code: 'ABCDEFG'[i], title: entry.label, subtitle: entry.caption, coords: entry.overview,
+          photo, code: 'ABCDEFG'[i], title: entry.label, subtitle: entry.caption, coords: entry.overview,
           frame, type: ['city', 'pyramid', 'tomb', 'ruin', 'tomb', 'rock', 'pyramid'][i], active: view.site?.region === id, action: () => {
             if (view.traveling) return;
             view.region = id;
@@ -172,36 +249,69 @@
         const related = site.chapters.map(id => chapters.findIndex(chapter => chapter.id === id));
         const first = related[0];
         const code = sceneNumber(first) + (site.alternate ? 'B' : '');
+        const photo = photos[site.alternate ? 'nubia' : site.chapters[0]];
+        usedPhotos.add(photo);
+        const shift = view.region === 'thebes' && !view.valley
+          ? ({ '05': -22, '08': 24, '09': -48, '11': 10, '12': 47, '13': -19 })[code]
+          : ({ '11': -12, '12': 12 })[code] || 0;
         if (related.length === 1) {
           addControls({
-            code, title: site.name, subtitle: types[site.type] + ' · ' + chapters[first].nameZh + (site.alternate ? '（第 ' + sceneNumber(first) + ' 幕的另一處遺跡）' : ''),
+            photo, shift, code, title: site.name, subtitle: types[site.type] + ' · ' + chapters[first].nameZh + (site.alternate ? '（第 ' + sceneNumber(first) + ' 幕的另一處遺跡）' : ''),
             coords: site.coords, frame, active: view.site === site, type: site.type,
             action: () => travelToStory(first, site)
           });
         } else {
-          const firstChoice = addControls({
-            code, pinCode: related.map(sceneNumber).join('–'), title: chapters[first].nameZh,
-            subtitle: site.name + ' · ' + types[site.type], coords: site.coords,
-            frame, active: view.site === site, type: site.type, action: () => travelToStory(first, site)
+          const subtitle = site.name + ' · ' + types[site.type];
+          addControls({
+            photo, code, pinCode: related.map(sceneNumber).join('–'), title: chapters[first].nameZh,
+            subtitle, coords: site.coords, frame, active: view.site === site && view.index === first, type: site.type,
+            action: () => travelToStory(first, site)
           });
           const second = related[1];
-          const other = firstChoice.cloneNode(true);
-          other.removeAttribute('aria-current');
-          other.querySelector('.adventure-code').textContent = sceneNumber(second);
-          if (view.site === site && view.index === second) {
-            firstChoice.removeAttribute('aria-current');
-            other.setAttribute('aria-current', 'location');
-          }
-          other.querySelector('strong').textContent = chapters[second].nameZh;
-          other.addEventListener('click', () => travelToStory(second, site));
-          choices.append(other);
+          addChoice({
+            photo, code: sceneNumber(second), title: chapters[second].nameZh, subtitle, type: site.type,
+            active: view.site === site && view.index === second, action: () => travelToStory(second, site)
+          });
         }
       });
     }
 
+    if (region) {
+      for (const mountain of mountains) {
+        const [x, y] = project(mountain.coords, frame);
+        if (x < 15 || x > W - 15 || y < 38 || y > H - 20) continue;
+        const photo = photos[mountain.photo];
+        usedPhotos.add(photo);
+        const landmark = createElement('div', 'adventure-pin mountain-pin');
+        landmark.setAttribute('aria-hidden', 'true');
+        const picture = createElement('span', 'pin-image');
+        placeImage(picture, photo, 'pyramid');
+        landmark.append(picture);
+        place(landmark, mountain.coords, frame);
+        pins.append(landmark);
+      }
+    }
+    renderMapCredits(usedPhotos);
+
     const traveler = el('adventure-traveler');
     traveler.hidden = !view.site || (region && view.site.region !== view.region) || (view.valley && view.site.type !== 'tomb');
     if (!traveler.hidden) place(traveler, region ? view.site.coords : regions[view.site.region].overview, frame);
+  }
+
+  function renderMapCredits(usedPhotos) {
+    const existing = el('adventure-credit');
+    const details = createElement('details', 'adventure-credit');
+    details.id = 'adventure-credit';
+    details.open = Boolean(existing?.open);
+    const list = document.createElement('ul');
+    for (const photo of usedPhotos) {
+      const item = createElement('li', '', photo[4] + ' · ');
+      addPhotoCredit(item, photo);
+      list.append(item);
+    }
+    details.append(createElement('summary', '', '地標圖像來源'), list);
+    if (existing) existing.replaceWith(details);
+    else el('adventure-map-note').after(details);
   }
 
   function scrollToMap() {
@@ -272,23 +382,21 @@
     const source = externalLink(site.source, '遺跡資料 ↗');
     panel.replaceChildren(info, description, source);
 
-    if (site.photo) {
-      const [hash, filename, author, license] = site.photo;
-      const page = 'https://commons.wikimedia.org/wiki/File:' + filename;
+    const photo = photos[site.alternate ? 'nubia' : site.chapters[0]];
+    if (photo) {
       const figure = createElement('figure', 'mt-3 overflow-hidden rounded-lg border border-[#D8CCB8]');
-      const anchor = externalLink(page, '');
+      const anchor = externalLink(photoPage(photo), '');
       const image = document.createElement('img');
-      image.src = 'https://thumb.wikimedia.org/wikipedia/commons/thumb/' + hash + '/' + filename + '/960px-' + filename;
-      image.alt = site.name + '實景';
+      image.src = photoUrl(photo);
+      image.alt = photo[4];
       image.loading = 'lazy';
       image.addEventListener('error', () => {
-        anchor.textContent = '在 Wikimedia Commons 開啟實景照片 ↗';
+        anchor.textContent = '在 Wikimedia Commons 開啟圖像 ↗';
         anchor.className = 'block p-3 text-sm';
       }, { once: true });
       anchor.append(image);
-      const caption = createElement('figcaption', 'p-2 text-sm', '實景照片 · ');
-      caption.append(externalLink(page, author + '／Wikimedia Commons'));
-      if (license) caption.append(' · ', externalLink('https://creativecommons.org/licenses/' + license + '/', 'CC BY-SA 4.0'));
+      const caption = createElement('figcaption', 'p-2 text-sm', photo[4] + ' · ');
+      addPhotoCredit(caption, photo);
       figure.append(anchor, caption);
       panel.append(figure);
     }

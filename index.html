@@ -7,8 +7,8 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
-  <link rel="stylesheet" href="adventure.css" />
-  <script src="adventure.js?v=2" defer></script>
+  <link rel="stylesheet" href="adventure.css?v=3" />
+  <script src="adventure.js?v=3" defer></script>
   <style>
     :root {
       --bg-paper: #FAF6EE;
@@ -161,7 +161,7 @@
 <body class="antialiased">
 
   <!-- Header & Era Navigation -->
-  <header class="bg-[#15294A] text-white border-b-4 border-[#C5963B]">
+  <header id="site-header" class="bg-[#15294A] text-white border-b-4 border-[#C5963B]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div class="flex items-center gap-3">
@@ -203,12 +203,12 @@
   </header>
 
   <section id="adventure" class="adventure" aria-labelledby="adventure-heading" hidden>
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-      <div>
+    <div class="adventure-intro">
+      <div class="adventure-intro-text">
         <h2 id="adventure-heading" class="font-serif-display font-bold" tabindex="-1">沿尼羅河探訪法老</h2>
         <p id="adventure-context" class="adventure-note">選擇地區，探索 17 幕故事。</p>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div class="adventure-actions">
         <button id="adventure-start" type="button" class="min-h-11 rounded-lg bg-[#6B3823] px-3 text-base font-semibold text-white">從序章開始</button>
         <button id="adventure-valley" type="button" class="min-h-11 rounded-lg border border-[#9C6041] px-3 text-base" hidden>放大帝王谷</button>
         <button id="adventure-all" type="button" class="min-h-11 rounded-lg border border-[#9C6041] px-3 text-base" hidden>全覽地圖</button>
@@ -225,7 +225,10 @@
         </div>
         <p id="adventure-map-note" class="adventure-note mt-2"></p>
       </div>
-      <div id="adventure-regions" aria-label="可探索的入口"></div>
+      <div class="adventure-directory">
+        <h3 id="adventure-directory-title" class="font-serif-display">選擇地區</h3>
+        <div id="adventure-regions" aria-labelledby="adventure-directory-title"></div>
+      </div>
     </div>
     <p id="adventure-status" class="sr-only" role="status"></p>
   </section>

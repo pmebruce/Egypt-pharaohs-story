@@ -1,133 +1,275 @@
-.adventure {
-  --sand: #ead1a0;
-  --ink: #302318;
-  --brick: #863b25;
-  max-width: 68rem;
-  margin: 0 auto;
-  padding: 1.25rem 1rem 2rem;
-  color: var(--ink);
-}
-.adventure[hidden], #adventure-return[hidden], #site-media[hidden], #adventure-all[hidden] {
-  display: none;
-}
 body[data-adventure-view="map"] {
+  color-scheme: dark;
+  background: #17110e;
   padding-bottom: env(safe-area-inset-bottom);
 }
-body[data-adventure-view="map"] :is(#chapter-selector, #main-stage, #playback-bar, #era-tabs, #story-shortcuts) {
-  display: none;
+
+body[data-adventure-view="map"] #site-header {
+  background: #1c1411;
+  border-color: #7c5737;
 }
+
+body[data-adventure-view="map"] :is(#chapter-selector, #main-stage, #playback-bar, #era-tabs, #story-shortcuts),
 body[data-adventure-view="story"] #adventure {
   display: none;
 }
-.adventure h2 { font-size: clamp(1.65rem, 4vw, 2.35rem); line-height: 1.3; }
-.adventure p { line-height: 1.55; }
+
+.adventure {
+  --sand: #f6dfb5;
+  --light-ink: #fff4dc;
+  --muted-ink: #dfc8a7;
+  --copper: #ce9e61;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+  color: var(--light-ink);
+}
+
+.adventure[hidden], .adventure button[hidden], #adventure-return[hidden], #site-media[hidden] {
+  display: none;
+}
+
+.adventure-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: end;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: clamp(13rem, 31vw, 21rem);
+  padding: clamp(1rem, 3vw, 2rem);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, #130b08d9 0%, #1b100b6e 53%, #28190910 100%),
+    linear-gradient(0deg, #140b08ce, transparent 67%),
+    url("assets/desert-cinematic.webp") 65% 48% / cover #423020;
+  border: 1px solid #765336;
+  border-radius: .9rem;
+  box-shadow: 0 15px 40px #09060480;
+}
+
+.adventure[data-scope="detail"] .adventure-intro {
+  min-height: 0;
+  background: linear-gradient(115deg, #312015, #241915);
+}
+
+.adventure-intro h2 {
+  font-size: clamp(1.8rem, 5vw, 3.15rem);
+  line-height: 1.2;
+  color: #fff0d2;
+  text-wrap: balance;
+  text-shadow: 0 2px 16px #1a0b03, 0 2px 4px #1a0b03;
+}
+
+.adventure-intro p,
+.adventure-note {
+  color: var(--muted-ink);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.adventure-intro p { margin-top: .45rem; }
+.adventure-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.adventure-actions button { border: 1px solid #a1764f; background: #24160edb; padding-inline: .85rem; }
+.adventure-actions button:hover { background: #523324; }
+.adventure-actions #adventure-start { background: #ecc383; color: #2c1c10; border-color: #ffe2ac; }
+.adventure-actions #adventure-start:hover { background: #ffdb9e; }
+
 .adventure-layout { display: grid; gap: 1rem; align-items: start; }
 .adventure-map {
   position: relative;
   aspect-ratio: 480 / 530;
   overflow: hidden;
-  border: 1px solid #996f45;
-  border-radius: 1rem;
-  background: #ead1a0;
+  border: 1px solid #9d7650;
+  border-radius: .85rem;
+  background: #9e6842 url("assets/desert-terrain.webp") center / cover;
+  box-shadow: inset 0 0 50px #31201070, 0 12px 35px #09060465;
   isolation: isolate;
 }
-.adventure-map svg, #adventure-pins { position: absolute; inset: 0; width: 100%; height: 100%; }
-#adventure-pins { pointer-events: none; }
+
+.adventure-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 40px #2b181578;
+  border-radius: inherit;
+}
+
+.adventure-map > svg, #adventure-pins { position: absolute; inset: 0; width: 100%; height: 100%; }
+#adventure-pins { pointer-events: none; z-index: 1; }
 .adventure-pin {
+  --pin-shift: 0px;
   pointer-events: auto;
   position: absolute;
-  transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
+  transform: translate(-50%, -70%);
+  width: 48px;
+  height: 48px;
   z-index: 1;
 }
-.adventure-pin:focus-visible { outline: 2px solid #15294a; border-radius: 50%; z-index: 4; }
-.adventure-pin span {
-  min-width: 25px;
-  min-height: 25px;
-  display: grid;
-  place-items: center;
-  padding: 0 3px;
-  border-radius: 7px;
-  background: #56321f;
-  color: #fff7e6;
-  border: 2px solid #fff2d7;
-  box-shadow: 0 2px 4px #50321975;
-  font-size: .8rem;
-  font-weight: 800;
-  line-height: 1;
+
+.adventure-pin:hover, .adventure-pin:focus-visible, .adventure-pin[aria-current] { z-index: 4; }
+.adventure-pin:focus-visible { outline: none; }
+.adventure-pin:focus-visible .pin-image, .adventure-pin[aria-current] .pin-image {
+  outline: 2px solid #fff1b3;
+  outline-offset: 2px;
 }
-.adventure-pin[aria-current] span { background: #fff5dc; color: #6b2f1f; border-color: #943f28; }
-.adventure-pin[data-type="pyramid"] span { background: #75351d; }
-.adventure-pin[data-type="tomb"] span { background: #32485a; }
-.adventure-pin[data-type="temple"] span { background: #28574c; }
-.adventure-pin[aria-current] span { outline: 2px solid #f7e2aa; }
+
+.pin-image {
+  position: absolute;
+  display: block;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(calc(-50% + var(--pin-shift)));
+  width: 49px;
+  height: 34px;
+  overflow: hidden;
+  background: linear-gradient(135deg,#493422,#806046);
+  border: 1px solid #f6d6a2;
+  border-radius: 6px 6px 4px 4px;
+  box-shadow: 0 3px 8px #1c110fe0;
+}
+
+.pin-image::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 6px #170c0670; }
+.pin-image img, .choice-image img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.pin-image img { filter: saturate(.84) contrast(1.08); }
+.pin-image svg { display: block; width: 100%; height: 100%; padding: 2px; }
+
+.pin-anchor {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border: 1px solid #fff0d3;
+  border-radius: 50%;
+  background: #432314;
+  box-shadow: 0 0 6px #ffbe70a0;
+}
+.pin-label {
+  position: absolute;
+  bottom: 19px;
+  right: 0;
+  transform: translateX(var(--pin-shift));
+  z-index: 1;
+  padding: .05rem .18rem;
+  min-width: 1.15rem;
+  border-radius: .2rem;
+  border: 1px solid #dcb986;
+  color: #fff8ea;
+  background: #201510f0;
+  font-size: .66rem;
+  line-height: 1.1;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.adventure[data-scope="overview"] .pin-label { background: #f4cd8c; color: #321d10; }
+.adventure[data-scope="overview"] .pin-image { width: 55px; height: 38px; }
+@media (max-width: 420px) {
+  .pin-image, .adventure[data-scope="overview"] .pin-image { width: 42px; height: 31px; }
+}
+
 #adventure-traveler {
   position: absolute;
   z-index: 5;
-  width: 30px;
-  height: 35px;
-  display: grid;
-  place-items: center;
-  transform: translate(-50%, -92%);
+  width: 31px;
+  height: 37px;
+  transform: translate(-50%, -78%);
   pointer-events: none;
-  filter: drop-shadow(0 2px 2px #39211380);
+  filter: drop-shadow(0 2px 2px #321c0dc0);
 }
 #adventure-traveler[hidden] { display: none; }
-#adventure-traveler svg { position: static; }
+#adventure-traveler svg { width: 100%; height: 100%; }
 #adventure-traveler.travelling { transition: left .48s ease-in-out, top .48s ease-in-out; }
-#adventure-regions { display: grid; gap: .5rem; }
+
+.adventure-directory h3 {
+  color: var(--sand);
+  font-size: 1.16rem;
+  font-weight: 700;
+  margin: 0 0 .65rem;
+}
+
+#adventure-regions { display: grid; gap: .55rem; }
 .adventure-choice {
   display: grid;
-  grid-template-columns: 1.75rem 1fr auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
-  gap: .65rem;
-  min-height: 52px;
-  padding: .55rem .7rem;
-  border: 1px solid #dbc4a1;
-  border-radius: .6rem;
+  gap: .75rem;
+  min-height: 64px;
+  padding: .35rem .7rem .35rem .35rem;
+  border: 1px solid #61452f;
+  border-radius: .58rem;
   text-align: left;
   font-size: 1rem;
   line-height: 1.4;
-  background: #fffaf0;
+  color: var(--light-ink);
+  background: linear-gradient(100deg, #312117, #201612);
 }
-.adventure-choice:hover, .adventure-choice[aria-current] { border-color: #9c6041; background: #f3e2c4; }
-.adventure-choice small { display: block; font-size: .85rem; color: #5a493b; }
+.adventure-choice:hover, .adventure-choice[aria-current] { border-color: #e6b981; background: #422b1d; }
+.adventure-choice small { display: block; font-size: .85rem; color: var(--muted-ink); margin-top: .12rem; }
+.adventure-choice strong { display: block; }
+.adventure-choice :is(strong, small) { overflow-wrap: anywhere; }
+.choice-image {
+  position: relative;
+  display: block;
+  height: 51px;
+  overflow: hidden;
+  border: 1px solid #8f6947;
+  border-radius: .36rem;
+  background: #4d3426;
+}
+.choice-image svg { display: block; width: 100%; height: 100%; padding: 4px; }
 .adventure-choice .adventure-code {
-  width: 1.75rem;
-  height: 1.75rem;
-  display: grid;
-  place-items: center;
-  color: #fff7e6;
-  background: #633922;
-  border-radius: .4rem;
-  font-size: .82rem;
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  min-width: 1.2rem;
+  padding: .02rem .18rem;
+  border-radius: .2rem;
+  text-align: center;
+  color: #29190b;
+  background: #f0c98c;
+  font-size: .77rem;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
-.adventure-legend { display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .88rem; color: #594333; }
-.adventure-note { color: #594333; font-size: .88rem; }
-#site-media a, #site-media button { text-decoration: underline; text-underline-offset: 3px; }
-#site-media figure img { display: block; width: 100%; max-height: 22rem; object-fit: contain; background: #efdfc1; }
+.adventure-choice .adventure-arrow { color: #ecc998; }
+.adventure :is(.adventure-choice, .adventure-actions button, .adventure-credit a):focus-visible {
+  outline: 2px solid #ffe0a3;
+  outline-offset: 3px;
+}
+.adventure-credit { color: #d4b899; font-size: .84rem; line-height: 1.65; margin-top: .65rem; }
+.adventure-credit summary { cursor: pointer; color: var(--sand); min-height: 36px; }
+.adventure-credit ul { list-style: disc; padding-left: 1.3rem; }
+.adventure-credit a, #site-media a { text-decoration: underline; text-underline-offset: 3px; }
+#site-media figure img { display: block; width: 100%; max-height: 26rem; object-fit: contain; background: #35261b; }
 @media (min-width: 800px) {
-  .adventure-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, .85fr); gap: 1.5rem; }
+  .adventure-layout { grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr); gap: 1.4rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   #adventure-traveler.travelling { transition: none; }
 }
-.adventure-pin svg {
-  position: absolute;
-  inset: 1px auto auto auto;
-  width: 30px;
-  height: 27px;
-  filter: drop-shadow(0 1px 1px #50321990);
+.terrain-label {
+  fill: #ffebbd;
+  stroke: #2b1a12;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
 }
-.adventure-pin:has(svg) span {
+.pin-leader {
   position: absolute;
-  top: 23px;
-  min-width: 18px;
-  min-height: 18px;
-  border-radius: 5px;
-  font-size: .67rem;
+  left: 50%;
+  bottom: 13px;
+  height: 1px;
+  background: #ffe9c4;
+  transform-origin: left center;
+}
+.mountain-pin { pointer-events: none; }
+.mountain-pin .pin-image {
+  border-color: #e0c7a2;
+  border-style: dashed;
 }
