@@ -32,7 +32,7 @@
     { chapters: ['piye'], region: 'kush', coords: [31.77093, 18.40947], type: 'pyramid', name: '庫魯皮耶墓 Ku 17', note: '位於今日蘇丹。原有金字塔上部已不存。', source: 'https://vici.org/vici/21588/?lang=en' },
     { chapters: ['psamtik1'], region: 'delta', coords: [30.76833, 30.96472], type: 'city', name: '塞易斯古都遺址', note: '尼羅河三角洲西部的第二十六王朝都城。', source: 'https://www.ees.ac.uk/resource/sais.html' },
     { chapters: ['ptolemy1', 'cleopatra7'], region: 'delta', coords: [29.9187, 31.2058], type: 'city', name: '亞歷山卓古城區', note: '兩幕共享古城入口。克麗奧佩脫拉七世的墓址仍未確認。', source: 'https://egymonuments.gov.eg/historical-periods/ptolemaic-period/' },
-    { chapters: ['ramesses2'], region: 'nubia', coords: [31.6256, 22.3369], type: 'rock', name: '阿布辛貝大神廟', note: '地圖採用神廟 1968 年遷移後的位置。', source: 'https://egymonuments.gov.eg/en/archaeological-sites/abu-simbel' }
+    { chapters: ['ramesses2'], region: 'nubia', alternate: true, coords: [31.6256, 22.3369], type: 'rock', name: '阿布辛貝大神廟', note: '地圖採用神廟 1968 年遷移後的位置。', source: 'https://egymonuments.gov.eg/en/archaeological-sites/abu-simbel' }
   ];
 
   const W = 480;
@@ -104,10 +104,11 @@
   };
 
   function addControls(item) {
-    const { code, title, subtitle, coords, frame, active, action, type } = item;
+    const { code, title, subtitle, coords, frame, active, action, type, pinCode = code } = item;
     const pin = createElement('button', 'adventure-pin');
     pin.type = 'button';
     pin.setAttribute('aria-label', title);
+    pin.setAttribute('aria-description', '地圖代號 ' + pinCode);
     pin.dataset.type = type || 'region';
     if (pinArt[type]) {
       const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -116,7 +117,7 @@
       icon.innerHTML = pinArt[type];
       pin.append(icon);
     }
-    pin.append(createElement('span', '', code));
+    pin.append(createElement('span', '', pinCode));
     place(pin, coords, frame);
     const choice = createElement('button', 'adventure-choice');
     choice.type = 'button';
@@ -134,6 +135,8 @@
     return choice;
   }
 
+  const sceneNumber = index => String(index + 1).padStart(2, '0');
+
   function renderMap() {
     const region = regions[view.region];
     const frame = view.valley ? valleyFrame : region?.frame ?? overviewFrame;
@@ -148,14 +151,14 @@
     el('adventure-heading').textContent = view.valley ? '帝王谷岩窟墓' : region?.label ?? '沿尼羅河探訪法老';
     el('adventure-context').textContent = view.valley ? '在谷地裡比較四座法老岩窟墓。' : region?.caption ?? '選擇地區，探索 17 幕故事。';
     el('adventure-map-note').textContent = region
-      ? '遺跡依經緯度落點。相鄰入口可用地點清單選取。'
-      : '北方朝上。區域標記依座標定位，河道與地形為簡化繪製。';
+      ? '數字是故事幕號。放大地圖仍使用相同幕號，相鄰入口可從地點清單選取。'
+      : 'A–G 是區域代號。進入區域後，數字代表故事幕號。河道與地形為簡化繪製。';
     drawTerrain(frame);
 
     if (!region) {
       Object.entries(regions).forEach(([id, entry], i) => {
         addControls({
-          code: String(i + 1), title: entry.label, subtitle: entry.caption, coords: entry.overview,
+          code: 'ABCDEFG'[i], title: entry.label, subtitle: entry.caption, coords: entry.overview,
           frame, type: ['city', 'pyramid', 'tomb', 'ruin', 'tomb', 'rock', 'pyramid'][i], active: view.site?.region === id, action: () => {
             if (view.traveling) return;
             view.region = id;
@@ -165,25 +168,30 @@
         });
       });
     } else {
-      sites.filter(site => site.region === view.region && (!view.valley || site.type === 'tomb')).forEach((site, i) => {
+      sites.filter(site => site.region === view.region && (!view.valley || site.type === 'tomb')).forEach(site => {
         const related = site.chapters.map(id => chapters.findIndex(chapter => chapter.id === id));
-        const code = String(i + 1);
         const first = related[0];
+        const code = sceneNumber(first) + (site.alternate ? 'B' : '');
         if (related.length === 1) {
           addControls({
-            code, title: site.name, subtitle: types[site.type] + ' · ' + chapters[first].nameZh,
+            code, title: site.name, subtitle: types[site.type] + ' · ' + chapters[first].nameZh + (site.alternate ? '（第 ' + sceneNumber(first) + ' 幕的另一處遺跡）' : ''),
             coords: site.coords, frame, active: view.site === site, type: site.type,
             action: () => travelToStory(first, site)
           });
         } else {
           const firstChoice = addControls({
-            code, title: chapters[first].nameZh,
+            code, pinCode: related.map(sceneNumber).join('–'), title: chapters[first].nameZh,
             subtitle: site.name + ' · ' + types[site.type], coords: site.coords,
             frame, active: view.site === site, type: site.type, action: () => travelToStory(first, site)
           });
           const second = related[1];
           const other = firstChoice.cloneNode(true);
           other.removeAttribute('aria-current');
+          other.querySelector('.adventure-code').textContent = sceneNumber(second);
+          if (view.site === site && view.index === second) {
+            firstChoice.removeAttribute('aria-current');
+            other.setAttribute('aria-current', 'location');
+          }
           other.querySelector('strong').textContent = chapters[second].nameZh;
           other.addEventListener('click', () => travelToStory(second, site));
           choices.append(other);
