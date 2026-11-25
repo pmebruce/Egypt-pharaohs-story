@@ -24,11 +24,6 @@
       --font-serif: Georgia, "Noto Serif TC", "Songti TC", "PMingLiU", serif;
     }
 
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 5rem;
-    }
-
     body {
       background-color: var(--bg-paper);
       color: var(--ink-main);
@@ -206,7 +201,7 @@
   </header>
 
   <!-- Selector Bar -->
-  <div class="bg-[#F3ECE0] border-b border-[#E5DCCB] sticky top-0 z-30">
+  <div id="chapter-selector" class="bg-[#F3ECE0] border-b border-[#E5DCCB] sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2.5 flex-1 min-w-0">
         <label for="pharaoh-select" class="sr-only sm:not-sr-only text-sm font-semibold text-[#57606F] shrink-0">
@@ -227,7 +222,7 @@
   <main id="main-stage" class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
 
     <!-- Pharaoh Title Banner -->
-    <section class="card-museum rounded-xl p-5 sm:p-7 relative overflow-hidden">
+    <section id="chapter-title-card" class="card-museum rounded-xl p-5 sm:p-7 relative overflow-hidden">
       <div id="watermark-number" class="watermark-num text-7xl sm:text-8xl font-bold absolute right-5 top-2 pointer-events-none">
         序
       </div>
@@ -1503,6 +1498,8 @@
     const elBtnResume = document.getElementById('btn-resume-reading');
     const elResumeChapter = document.getElementById('resume-chapter');
     const elStageHeading = document.getElementById('stage-heading');
+    const elChapterTitle = document.getElementById('chapter-title-card');
+    const elChapterSelector = document.getElementById('chapter-selector');
     const elSelect = document.getElementById('pharaoh-select');
     const elCounter = document.getElementById('scene-counter');
     const elWatermark = document.getElementById('watermark-number');
@@ -1562,11 +1559,18 @@
       return String(n).padStart(2, '0');
     }
 
-    function scrollToStage() {
-      const stage = document.getElementById('main-stage');
-      if (stage) {
-        stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    function scrollToSection(section, { keepVisible = false } = {}) {
+      const top = section.getBoundingClientRect().top;
+      const inset = elChapterSelector.getBoundingClientRect().height + 12;
+      if (Math.abs(top - inset) <= 1) return;
+      if (keepVisible && top >= inset - 1 &&
+          elStageHeading.getBoundingClientRect().bottom <= window.innerHeight * 0.55) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({
+        top: Math.max(0, window.scrollY + top - inset),
+        behavior: reduceMotion ? 'instant' : 'smooth'
+      });
     }
 
     function stopPlayback() {
@@ -1598,7 +1602,7 @@
           utter.onend = () => {
             if (!state.isPlaying) return;
             if (state.currentIndex < PHARAOHS.length - 1) {
-              goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true });
+              goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true, keepVisible: true });
             } else {
               stopPlayback();
             }
@@ -1609,7 +1613,7 @@
             state.timerId = setTimeout(() => {
               if (!state.isPlaying) return;
               if (state.currentIndex < PHARAOHS.length - 1) {
-                goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true });
+                goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true, keepVisible: true });
               } else {
                 stopPlayback();
               }
@@ -1627,7 +1631,7 @@
       state.timerId = setTimeout(() => {
         if (!state.isPlaying) return;
         if (state.currentIndex < PHARAOHS.length - 1) {
-          goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true });
+          goToScene(state.currentIndex + 1, { scroll: true, keepPlaying: true, keepVisible: true });
         } else {
           stopPlayback();
         }
@@ -1660,7 +1664,7 @@
         }
       }
       if (opts.scroll) {
-        scrollToStage();
+        scrollToSection(elChapterTitle, { keepVisible: opts.keepVisible });
       }
       if (keepPlaying && state.isPlaying) {
         runPlaybackStep();
@@ -2172,7 +2176,7 @@
           state.activeTheme = tid;
           renderThematicSection();
           const sec = document.getElementById('thematic-section');
-          if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (sec) scrollToSection(sec);
         });
         elStageThemeTags.appendChild(tag);
       });
@@ -2235,11 +2239,11 @@
 
     // Event Listeners
     document.getElementById('btn-jump-timeline').addEventListener('click', () => {
-      document.getElementById('timeline-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      scrollToSection(document.getElementById('timeline-section'));
     });
 
     document.getElementById('btn-jump-themes').addEventListener('click', () => {
-      document.getElementById('thematic-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      scrollToSection(document.getElementById('thematic-section'));
     });
 
     elBtnMapStart.addEventListener('click', () => {
@@ -2253,11 +2257,11 @@
     });
 
     document.getElementById('btn-prev').addEventListener('click', () => {
-      goToScene(state.currentIndex - 1, { scroll: true });
+      goToScene(state.currentIndex - 1, { scroll: true, keepVisible: true });
     });
 
     document.getElementById('btn-next').addEventListener('click', () => {
-      goToScene(state.currentIndex + 1, { scroll: true });
+      goToScene(state.currentIndex + 1, { scroll: true, keepVisible: true });
     });
 
     elBtnPlay.addEventListener('click', () => {
@@ -2300,9 +2304,9 @@
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
       if (e.key === 'ArrowLeft') {
-        goToScene(state.currentIndex - 1, { scroll: true });
+        goToScene(state.currentIndex - 1, { scroll: true, keepVisible: true });
       } else if (e.key === 'ArrowRight') {
-        goToScene(state.currentIndex + 1, { scroll: true });
+        goToScene(state.currentIndex + 1, { scroll: true, keepVisible: true });
       }
     });
 
