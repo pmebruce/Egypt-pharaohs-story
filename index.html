@@ -195,6 +195,11 @@
         </div>
       </div>
 
+      <button id="btn-resume-reading" type="button" hidden
+        class="mb-4 min-h-11 rounded-md border border-[#C5963B] bg-white/10 px-3 py-2 text-left text-base text-white hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E8D5A7]">
+        繼續上次閱讀<span id="resume-chapter" class="ml-2 text-[#E8D5A7]"></span>
+      </button>
+
       <!-- Balanced 4x2 Era Tabs -->
       <nav aria-label="歷史時期導覽" id="era-tabs" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></nav>
     </div>
@@ -232,7 +237,7 @@
           <span id="stage-dynasty-badge" class="px-2.5 py-0.5 rounded-full bg-[#F3ECE0] text-[#7A5415] border border-[#E2D3B3] font-medium"></span>
           <span id="stage-years" class="font-mono font-semibold text-[#A63A2B]"></span>
         </div>
-        <h2 class="font-serif-display text-3xl sm:text-4xl font-bold text-[#15294A] tracking-tight">
+        <h2 id="stage-heading" tabindex="-1" class="font-serif-display text-3xl sm:text-4xl font-bold text-[#15294A] tracking-tight">
           <span id="stage-name-zh"></span>
           <span id="stage-name-en" class="block sm:inline text-lg sm:text-2xl font-normal text-[#57606F] sm:ml-2"></span>
         </h2>
@@ -240,12 +245,47 @@
       </div>
     </section>
 
-    <!-- Dual Column Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- Story, visual materials, and sources -->
+    <div class="grid grid-cols-1 gap-6 items-start lg:grid-cols-12 lg:grid-rows-[auto_1fr]">
+      <div class="min-w-0 space-y-6 lg:col-start-6 lg:col-span-7 lg:row-start-1">
+        <!-- Historical Turning Point & Theme Tags -->
+        <section class="card-museum rounded-xl p-5 sm:p-6 border-l-4 border-l-[#C5963B]">
+          <div class="text-sm font-bold tracking-wider text-[#7A5415] mb-1.5">
+            這一任的歷史轉折
+          </div>
+          <p id="stage-turning-point" class="font-serif-display text-xl sm:text-2xl font-bold text-[#15294A] leading-snug"></p>
+          <div id="stage-theme-tags" class="flex flex-wrap gap-2 mt-3.5"></div>
+        </section>
 
-      <!-- Left Column: Visual, Map & Data -->
-      <div class="lg:col-span-5 space-y-6">
+        <!-- 3-Part Structured Narrative -->
+        <section class="card-museum rounded-xl p-5 sm:p-6 space-y-5">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#15294A] text-white">01</span>
+              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">接下什麼局面</h3>
+            </div>
+            <p id="narrative-inherited" class="text-[#374151]"></p>
+          </div>
 
+          <div class="pt-4 border-t border-[#EFE7D8]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#C5963B] text-white">02</span>
+              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">做了什麼選擇</h3>
+            </div>
+            <p id="narrative-choices" class="text-[#374151]"></p>
+          </div>
+
+          <div class="pt-4 border-t border-[#EFE7D8]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#A63A2B] text-white">03</span>
+              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">留下什麼影響</h3>
+            </div>
+            <p id="narrative-legacy" class="text-[#374151]"></p>
+          </div>
+        </section>
+      </div>
+
+      <div class="min-w-0 space-y-6 lg:col-start-1 lg:col-span-5 lg:row-start-1 lg:row-span-2">
         <!-- Archival Illustration Plate -->
         <section class="card-museum rounded-xl overflow-hidden">
           <div class="relative bg-[#EDE5D5] aspect-[4/3] overflow-hidden group cursor-pointer" id="plate-container" role="button" tabindex="0" aria-label="放大檢視歷史插畫">
@@ -344,48 +384,9 @@
             </p>
           </div>
         </section>
-
       </div>
 
-      <!-- Right Column: Narrative & Primary Sources -->
-      <div class="lg:col-span-7 space-y-6">
-
-        <!-- Historical Turning Point & Theme Tags -->
-        <section class="card-museum rounded-xl p-5 sm:p-6 border-l-4 border-l-[#C5963B]">
-          <div class="text-sm font-bold tracking-wider text-[#7A5415] mb-1.5">
-            這一任的歷史轉折
-          </div>
-          <p id="stage-turning-point" class="font-serif-display text-xl sm:text-2xl font-bold text-[#15294A] leading-snug"></p>
-          <div id="stage-theme-tags" class="flex flex-wrap gap-2 mt-3.5"></div>
-        </section>
-
-        <!-- 3-Part Structured Narrative -->
-        <section class="card-museum rounded-xl p-5 sm:p-6 space-y-5">
-          <div>
-            <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#15294A] text-white">01</span>
-              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">接下什麼局面</h3>
-            </div>
-            <p id="narrative-inherited" class="text-[#374151]"></p>
-          </div>
-
-          <div class="pt-4 border-t border-[#EFE7D8]">
-            <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#C5963B] text-white">02</span>
-              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">做了什麼選擇</h3>
-            </div>
-            <p id="narrative-choices" class="text-[#374151]"></p>
-          </div>
-
-          <div class="pt-4 border-t border-[#EFE7D8]">
-            <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#A63A2B] text-white">03</span>
-              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">留下什麼影響</h3>
-            </div>
-            <p id="narrative-legacy" class="text-[#374151]"></p>
-          </div>
-        </section>
-
+      <div class="min-w-0 space-y-6 lg:col-start-6 lg:col-span-7 lg:row-start-2">
         <!-- Primary Inscription / Source Quote -->
         <section class="card-museum rounded-xl p-5 sm:p-6 bg-[#FCF9F3]">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
@@ -421,7 +422,6 @@
           </h3>
           <div id="stage-links" class="flex flex-wrap gap-2.5"></div>
         </section>
-
       </div>
     </div>
 
@@ -1485,6 +1485,8 @@
       }
     ];
 
+    const readingProgressKey = 'egypt-pharaohs-story:last-chapter';
+
     // Application State
     const state = {
       currentIndex: 0,
@@ -1498,6 +1500,9 @@
 
     // DOM Elements
     const elEraTabs = document.getElementById('era-tabs');
+    const elBtnResume = document.getElementById('btn-resume-reading');
+    const elResumeChapter = document.getElementById('resume-chapter');
+    const elStageHeading = document.getElementById('stage-heading');
     const elSelect = document.getElementById('pharaoh-select');
     const elCounter = document.getElementById('scene-counter');
     const elWatermark = document.getElementById('watermark-number');
@@ -1643,14 +1648,43 @@
       if (!keepPlaying && state.isPlaying) {
         stopPlayback();
       }
+      const chapterChanged = clamped !== state.currentIndex;
       state.currentIndex = clamped;
       renderAll();
+      if (chapterChanged) {
+        elBtnResume.hidden = true;
+        try {
+          localStorage.setItem(readingProgressKey, PHARAOHS[clamped].id);
+        } catch {
+          // Reading still works when browser storage is unavailable.
+        }
+      }
       if (opts.scroll) {
         scrollToStage();
       }
       if (keepPlaying && state.isPlaying) {
         runPlaybackStep();
       }
+    }
+
+    function initReadingProgress() {
+      let savedId;
+      try {
+        savedId = localStorage.getItem(readingProgressKey);
+      } catch {
+        return;
+      }
+
+      const savedIndex = PHARAOHS.findIndex(pharaoh => pharaoh.id === savedId);
+      if (savedIndex === -1) return;
+
+      elResumeChapter.textContent = PHARAOHS[savedIndex].nameZh;
+      elBtnResume.hidden = false;
+      elBtnResume.addEventListener('click', () => {
+        elBtnResume.hidden = true;
+        goToScene(savedIndex, { scroll: true });
+        elStageHeading.focus({ preventScroll: true });
+      });
     }
 
     // Build Static UI Controls
@@ -2280,6 +2314,7 @@
     initEraTabs();
     initSelectDropdown();
     initTimeline();
+    initReadingProgress();
     renderAll();
     loadWorldAtlas();
   </script>
