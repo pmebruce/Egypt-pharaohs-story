@@ -1,0 +1,133 @@
+.adventure {
+  --sand: #ead1a0;
+  --ink: #302318;
+  --brick: #863b25;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2rem;
+  color: var(--ink);
+}
+.adventure[hidden], #adventure-return[hidden], #site-media[hidden], #adventure-all[hidden] {
+  display: none;
+}
+body[data-adventure-view="map"] {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+body[data-adventure-view="map"] :is(#chapter-selector, #main-stage, #playback-bar, #era-tabs, #story-shortcuts) {
+  display: none;
+}
+body[data-adventure-view="story"] #adventure {
+  display: none;
+}
+.adventure h2 { font-size: clamp(1.65rem, 4vw, 2.35rem); line-height: 1.3; }
+.adventure p { line-height: 1.55; }
+.adventure-layout { display: grid; gap: 1rem; align-items: start; }
+.adventure-map {
+  position: relative;
+  aspect-ratio: 480 / 530;
+  overflow: hidden;
+  border: 1px solid #996f45;
+  border-radius: 1rem;
+  background: #ead1a0;
+  isolation: isolate;
+}
+.adventure-map svg, #adventure-pins { position: absolute; inset: 0; width: 100%; height: 100%; }
+#adventure-pins { pointer-events: none; }
+.adventure-pin {
+  pointer-events: auto;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.adventure-pin:focus-visible { outline: 2px solid #15294a; border-radius: 50%; z-index: 4; }
+.adventure-pin span {
+  min-width: 25px;
+  min-height: 25px;
+  display: grid;
+  place-items: center;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: #56321f;
+  color: #fff7e6;
+  border: 2px solid #fff2d7;
+  box-shadow: 0 2px 4px #50321975;
+  font-size: .8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.adventure-pin[aria-current] span { background: #fff5dc; color: #6b2f1f; border-color: #943f28; }
+.adventure-pin[data-type="pyramid"] span { background: #75351d; }
+.adventure-pin[data-type="tomb"] span { background: #32485a; }
+.adventure-pin[data-type="temple"] span { background: #28574c; }
+.adventure-pin[aria-current] span { outline: 2px solid #f7e2aa; }
+#adventure-traveler {
+  position: absolute;
+  z-index: 5;
+  width: 30px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -92%);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px #39211380);
+}
+#adventure-traveler[hidden] { display: none; }
+#adventure-traveler svg { position: static; }
+#adventure-traveler.travelling { transition: left .48s ease-in-out, top .48s ease-in-out; }
+#adventure-regions { display: grid; gap: .5rem; }
+.adventure-choice {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  align-items: center;
+  gap: .65rem;
+  min-height: 52px;
+  padding: .55rem .7rem;
+  border: 1px solid #dbc4a1;
+  border-radius: .6rem;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.4;
+  background: #fffaf0;
+}
+.adventure-choice:hover, .adventure-choice[aria-current] { border-color: #9c6041; background: #f3e2c4; }
+.adventure-choice small { display: block; font-size: .85rem; color: #5a493b; }
+.adventure-choice .adventure-code {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: grid;
+  place-items: center;
+  color: #fff7e6;
+  background: #633922;
+  border-radius: .4rem;
+  font-size: .82rem;
+  font-weight: 800;
+}
+.adventure-legend { display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .88rem; color: #594333; }
+.adventure-note { color: #594333; font-size: .88rem; }
+#site-media a, #site-media button { text-decoration: underline; text-underline-offset: 3px; }
+#site-media figure img { display: block; width: 100%; max-height: 22rem; object-fit: contain; background: #efdfc1; }
+@media (min-width: 800px) {
+  .adventure-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, .85fr); gap: 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #adventure-traveler.travelling { transition: none; }
+}
+.adventure-pin svg {
+  position: absolute;
+  inset: 1px auto auto auto;
+  width: 30px;
+  height: 27px;
+  filter: drop-shadow(0 1px 1px #50321990);
+}
+.adventure-pin:has(svg) span {
+  position: absolute;
+  top: 23px;
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 5px;
+  font-size: .67rem;
+}
