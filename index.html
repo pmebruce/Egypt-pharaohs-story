@@ -201,6 +201,42 @@
       text-underline-offset: .18em;
       overflow-wrap: anywhere;
     }
+    .story-illustration {
+      margin-top: 1rem;
+      overflow: hidden;
+      border: 1px solid var(--border-soft);
+      border-radius: .65rem;
+      background: var(--bg-control);
+    }
+    .story-illustration button {
+      position: relative;
+      display: block;
+      width: 100%;
+      cursor: zoom-in;
+    }
+    .story-illustration button:focus-visible {
+      outline: 2px solid var(--gold-warm);
+      outline-offset: -3px;
+    }
+    .story-illustration img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      object-fit: cover;
+    }
+    .story-illustration figcaption {
+      padding: .75rem 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    #lightbox-modal {
+      width: min(56rem, calc(100% - 2rem));
+      max-height: calc(100dvh - 2rem);
+      margin: auto;
+    }
+    #lightbox-modal::backdrop {
+      background-color: rgb(0 0 0 / 85%);
+    }
   </style>
 </head>
 <body class="antialiased">
@@ -367,6 +403,16 @@
               <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[color:var(--ink-main)]">做了什麼選擇</h3>
             </div>
             <p id="narrative-choices" class="text-[color:var(--ink-main)]"></p>
+            <figure id="story-illustration" class="story-illustration" hidden>
+              <button id="btn-story-illustration" type="button" aria-haspopup="dialog">
+                <img id="story-illustration-img" width="960" height="640" loading="lazy" decoding="async" alt="" />
+                <span aria-hidden="true" class="absolute bottom-2.5 right-2.5 rounded-md bg-black/80 px-2.5 py-1 text-sm text-white">放大</span>
+              </button>
+              <figcaption>
+                <span class="block font-semibold text-[color:var(--gold-warm)]">場景示意插圖</span>
+                <span id="story-illustration-caption"></span>
+              </figcaption>
+            </figure>
           </div>
 
           <div class="pt-4 border-t border-[color:var(--border-soft)]">
@@ -626,20 +672,18 @@
   </div>
 
   <!-- Lightbox Modal -->
-  <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/85 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="歷史插畫放大檢視">
-    <div class="max-w-4xl w-full bg-[color:var(--bg-subtle)] rounded-xl overflow-hidden shadow-2xl border border-[color:var(--gold-warm)]">
-      <div class="flex items-center justify-between px-4 py-3 bg-[color:var(--bg-control)] text-white">
-        <div id="lightbox-title" class="font-serif-display font-bold text-sm sm:text-base"></div>
-        <button id="btn-close-lightbox" type="button" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs sm:text-sm">
-          關閉 ✕
-        </button>
-      </div>
-      <div class="bg-[color:var(--bg-paper)] flex items-center justify-center max-h-[70vh] overflow-hidden">
-        <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[70vh] object-contain" />
-      </div>
-      <div class="p-4 bg-[color:var(--bg-subtle)] text-base text-[color:var(--ink-main)] leading-relaxed" id="lightbox-caption"></div>
+  <dialog id="lightbox-modal" class="bg-[color:var(--bg-subtle)] rounded-xl shadow-2xl border border-[color:var(--gold-warm)]" aria-labelledby="lightbox-title">
+    <div class="flex items-center justify-between px-4 py-3 bg-[color:var(--bg-control)] text-white">
+      <div id="lightbox-title" class="font-serif-display font-bold text-sm sm:text-base"></div>
+      <button id="btn-close-lightbox" type="button" autofocus class="min-h-11 shrink-0 px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-sm">
+        關閉 ✕
+      </button>
     </div>
-  </div>
+    <div class="bg-[color:var(--bg-paper)] flex items-center justify-center max-h-[70vh] overflow-hidden">
+      <img id="lightbox-img" alt="" class="max-w-full max-h-[65dvh] object-contain" />
+    </div>
+    <div class="p-4 bg-[color:var(--bg-subtle)] text-base text-[color:var(--ink-main)] leading-relaxed" id="lightbox-caption"></div>
+  </dialog>
 
   <script>
     // Verified Archaeological & Historical Site Coordinates [lng, lat]
@@ -685,6 +729,49 @@
       newk: 'assets/new_karnak.jpg',
       ramesses: 'assets/ramesses_abusimbel.jpg',
       ptolemy: 'assets/ptolemy_alexandria.jpg'
+    };
+
+    const STORY_ILLUSTRATIONS = {
+      djoser: {
+        title: '薩卡拉的階梯金字塔',
+        alt: '從石造院落仰望層層退縮的階梯金字塔',
+        caption: '從院落看左塞爾的王陵，層層退縮的塔身與四周圍牆，共同構成一座葬祭園區。'
+      },
+      khufu: {
+        title: '從圖拉運來的石灰岩',
+        alt: '船員在尼羅河岸搬運木船上的淺色石灰岩',
+        caption: '梅勒日誌記錄了從圖拉運送石灰岩到古夫工程區的船隊。畫面呈現這段水運後勤。'
+      },
+      senusret3: {
+        title: '尼羅河第二瀑布一帶的要塞',
+        alt: '泥磚要塞俯瞰曲折河道與岩石小島',
+        caption: '從河岸要塞望向航道，可以想像中王國如何監看船隻往來，並為邊境駐軍補給。'
+      },
+      hatshepsut: {
+        title: '哈特謝普蘇特的龐特遠航',
+        alt: '帆船停泊岸邊，船員搬運貨物和一株幼樹',
+        caption: '哈特謝普蘇特祭殿的浮雕留下了龐特遠航的紀錄。畫面以船隻與乳香樹苗呈現這趟貿易之旅。'
+      },
+      akhenaten: {
+        title: '阿瑪納的露天祭祀',
+        alt: '陽光照入露天石造庭院，院中排列供桌',
+        caption: '阿肯那頓的新都設有露天祭祀空間。陽光可以直接照進庭院，呈現阿頓崇拜與神廟空間的關係。'
+      },
+      tutankhamun: {
+        title: '帝王谷王墓內的葬具',
+        alt: '岩窟墓室裡的金色葬具與牆面彩繪',
+        caption: '以圖坦卡門王墓的彩繪與金色葬具為靈感，呈現狹小墓室裡的王室葬儀。'
+      },
+      piye: {
+        title: '庫施王國的巴爾卡爾山',
+        alt: '尼羅河上游河谷旁的平頂砂岩山與細長岩柱',
+        caption: '從尼羅河上游望向巴爾卡爾山。這一帶是納帕塔的宗教重地，也是理解庫施王權的起點。'
+      },
+      cleopatra7: {
+        title: '托勒密王朝末期的亞歷山卓港',
+        alt: '暮色下的亞歷山卓港，木船穿行於石造碼頭前',
+        caption: '從港口理解克麗奧佩脫拉七世所處的王國。亞歷山卓透過航運把埃及的糧食、貿易與東地中海連在一起。'
+      }
     };
 
     const PHARAOHS = [
@@ -1657,6 +1744,28 @@
     const elLightboxImg = document.getElementById('lightbox-img');
     const elLightboxTitle = document.getElementById('lightbox-title');
     const elLightboxCaption = document.getElementById('lightbox-caption');
+    const elStoryIllustration = document.getElementById('story-illustration');
+    const elStoryIllustrationButton = document.getElementById('btn-story-illustration');
+    const elStoryIllustrationImg = document.getElementById('story-illustration-img');
+    const elStoryIllustrationCaption = document.getElementById('story-illustration-caption');
+
+    function storyIllustrationUrl(id) {
+      return `assets/illustrations/${id}.webp`;
+    }
+
+    function renderStoryIllustration(chapterId) {
+      const illustration = STORY_ILLUSTRATIONS[chapterId];
+      elStoryIllustration.hidden = !illustration;
+      if (!illustration) {
+        elStoryIllustrationImg.removeAttribute('src');
+        return;
+      }
+      elStoryIllustrationButton.setAttribute('aria-label', `放大檢視：${illustration.title}`);
+      elStoryIllustrationImg.alt = illustration.alt;
+      elStoryIllustrationCaption.textContent = illustration.caption;
+      const src = storyIllustrationUrl(chapterId);
+      if (elStoryIllustrationImg.getAttribute('src') !== src) elStoryIllustrationImg.src = src;
+    }
 
     function getEraById(id) {
       return ERAS.find(e => e.id === id) || ERAS[0];
@@ -2249,6 +2358,7 @@
       const idx = state.currentIndex;
       const p = PHARAOHS[idx];
       window.renderPharaohDepth?.(p);
+      renderStoryIllustration(p.id);
       const era = getEraById(p.eraId);
 
       // Era tabs active state
@@ -2341,19 +2451,22 @@
     }
 
     // Lightbox Controls
-    function openLightbox() {
-      const p = PHARAOHS[state.currentIndex];
-      elLightboxTitle.textContent = `${p.nameZh}（${p.dynasty}・${p.yearsText}）`;
-      elLightboxImg.src = p.plateImg;
-      elLightboxImg.alt = p.plateCaption;
-      elLightboxCaption.textContent = p.plateCaption;
-      elLightboxModal.classList.remove('hidden');
-      elLightboxModal.classList.add('flex');
+    function openLightbox({ title, src, alt, caption }) {
+      elLightboxTitle.textContent = title;
+      elLightboxImg.src = src;
+      elLightboxImg.alt = alt;
+      elLightboxCaption.textContent = caption;
+      elLightboxModal.showModal();
     }
 
-    function closeLightbox() {
-      elLightboxModal.classList.add('hidden');
-      elLightboxModal.classList.remove('flex');
+    function openChapterPlate() {
+      const p = PHARAOHS[state.currentIndex];
+      openLightbox({
+        title: `${p.nameZh}（${p.dynasty}・${p.yearsText}）`,
+        src: p.plateImg,
+        alt: p.plateCaption,
+        caption: p.plateCaption
+      });
     }
 
     // Event Listeners
@@ -2412,24 +2525,29 @@
     document.getElementById('btn-theme-next').addEventListener('click', () => navigateWithinTheme(1));
 
     const plateContainer = document.getElementById('plate-container');
-    plateContainer.addEventListener('click', openLightbox);
+    plateContainer.addEventListener('click', openChapterPlate);
     plateContainer.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openLightbox();
+        openChapterPlate();
       }
     });
 
-    document.getElementById('btn-close-lightbox').addEventListener('click', closeLightbox);
-    elLightboxModal.addEventListener('click', (e) => {
-      if (e.target === elLightboxModal) closeLightbox();
+    elStoryIllustrationButton.addEventListener('click', () => {
+      const { id } = PHARAOHS[state.currentIndex];
+      const illustration = STORY_ILLUSTRATIONS[id];
+      if (illustration) openLightbox({
+        ...illustration,
+        src: storyIllustrationUrl(id),
+        caption: `場景示意插圖。 ${illustration.caption}`
+      });
     });
-
+    document.getElementById('btn-close-lightbox').addEventListener('click', () => elLightboxModal.close());
+    elLightboxModal.addEventListener('click', (event) => {
+      if (event.target === elLightboxModal) elLightboxModal.close();
+    });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeLightbox();
-        return;
-      }
+      if (elLightboxModal.open) return;
       if (['map', 'timeline'].includes(document.body.dataset.adventureView)) return;
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
