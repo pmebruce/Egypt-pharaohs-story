@@ -73,7 +73,15 @@
 
   const el = id => document.getElementById(id);
   const view = { region: null, valley: false, index: 0, site: null, traveling: false };
+  const tombRoute = {
+    djoser: '左塞爾的王陵以六層階梯堆疊，從薩卡拉地面向上升起。',
+    khufu: '古夫的大金字塔改用斜面外形，墓室位於塔體內部。',
+    tutankhamun: '圖坦卡門葬在帝王谷，墓室開鑿於岩層中。'
+  };
+  const timeline = { themed: false, opened: null, offset: 0 };
+  const timelineCards = [];
   let chapters;
+  let chapterEras;
   let enterStory;
 
   function project(coords, frame) {
@@ -147,7 +155,7 @@
     }
   }
 
-  function placeImage(container, photo, type) {
+  function placeImage(container, photo, type, lazy = false) {
     const fallback = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     fallback.setAttribute('viewBox', '0 0 34 28');
     fallback.setAttribute('aria-hidden', 'true');
@@ -157,10 +165,11 @@
     const image = document.createElement('img');
     image.alt = '';
     image.decoding = 'async';
-    image.style.display = 'none';
+    if (lazy) image.loading = 'lazy';
+    image.style.opacity = '0';
     image.addEventListener('load', () => {
       fallback.remove();
-      image.style.display = '';
+      image.style.opacity = '';
     }, { once: true });
     image.addEventListener('error', () => image.remove(), { once: true });
     image.src = photoUrl(photo, true);
@@ -322,10 +331,124 @@
 
   function showMap(region, valley = false) {
     view.valley = valley;
-    document.body.dataset.adventureView = 'map';
+    setExploreView('map');
     view.region = region;
     renderMap();
     scrollToMap();
+  }
+
+  function setExploreView(mode) {
+    document.body.dataset.adventureView = mode;
+    for (const name of ['map', 'timeline']) {
+      el('explore-' + name).setAttribute('aria-pressed', String(name === mode));
+    }
+    el('history-scroll').hidden = mode !== 'timeline';
+  }
+
+  function focusTimelineItem(item, offset = 0) {
+    item.focus({ preventScroll: true });
+    const top = window.scrollY + item.getBoundingClientRect().top;
+    window.scrollTo({ top: Math.max(0, top - Math.max(offset, el('explore-nav').offsetHeight + 12)), behavior: 'instant' });
+  }
+
+  function setTimelineFilter(themed) {
+    timeline.themed = themed;
+    el('history-all').setAttribute('aria-pressed', String(!themed));
+    el('history-tombs').setAttribute('aria-pressed', String(themed));
+    el('history-filter-note').hidden = !themed;
+    chapterEras.forEach(era => {
+      const group = el('history-' + era.id);
+      const hasTombs = chapters.some(chapter => chapter.eraId === era.id && chapter.id in tombRoute);
+      group.hidden = themed && !hasTombs;
+      el('history-link-' + era.id).hidden = themed && !hasTombs;
+    });
+    chapters.forEach((chapter, index) => {
+      const highlight = tombRoute[chapter.id];
+      const card = timelineCards[index];
+      card.hidden = themed && !highlight;
+      card.querySelector('.history-summary').textContent = themed && highlight ? highlight : chapter.turningPoint;
+    });
+  }
+
+  function showTimeline(index) {
+    if (view.traveling) return;
+    setExploreView('timeline');
+    if (index == null) {
+      el('history-heading').focus({ preventScroll: true });
+      return;
+    }
+    const card = timelineCards[index];
+    const restorePosition = !card.hidden && timeline.opened === index;
+    if (card.hidden) setTimelineFilter(false);
+    focusTimelineItem(card, restorePosition ? timeline.offset : 24);
+  }
+
+  function initializeTimeline() {
+    const spans = chapterEras.map(era => era.span.match(/\d+/g).map(Number));
+    const oldest = Math.max(...spans.flat());
+    const latest = Math.min(...spans.flat());
+    const position = year => (oldest - year) / (oldest - latest) * 100;
+    const scale = el('history-scale');
+    scale.append(createElement('span', 'history-axis'));
+
+    chapterEras.forEach((era, eraIndex) => {
+      const [begin, end] = spans[eraIndex];
+      const band = createElement('span', 'history-range');
+      band.style.left = position(begin) + '%';
+      band.style.width = position(end) - position(begin) + '%';
+      band.style.backgroundColor = era.color;
+      band.setAttribute('aria-hidden', 'true');
+      scale.append(band);
+
+      const section = createElement('section', 'history-era');
+      section.id = 'history-' + era.id;
+      section.style.setProperty('--era-color', era.color);
+      const heading = createElement('h3', 'font-serif-display', era.label);
+      heading.tabIndex = -1;
+      section.append(heading, createElement('time', '', era.span));
+      el('history-chapters').append(section);
+
+      const jump = createElement('button', '', era.label);
+      jump.type = 'button';
+      jump.id = 'history-link-' + era.id;
+      jump.style.setProperty('--era-color', era.color);
+      jump.addEventListener('click', () => focusTimelineItem(heading, 16));
+      el('history-era-links').append(jump);
+
+      chapters.forEach((chapter, index) => {
+        if (chapter.eraId !== era.id) return;
+        const site = mainSite(index);
+        const card = createElement('button', 'history-card');
+        card.type = 'button';
+        const picture = createElement('span', 'history-picture');
+        placeImage(picture, photos[site.chapters[0]], site.type, true);
+        const details = createElement('span', '');
+        details.append(
+          createElement('strong', 'font-serif-display', sceneNumber(index) + ' · ' + chapter.nameZh),
+          createElement('time', '', chapter.yearsText),
+          createElement('span', 'history-summary', chapter.turningPoint)
+        );
+        card.append(picture, details);
+        card.addEventListener('click', () => {
+          timeline.opened = index;
+          timeline.offset = Math.max(12, card.getBoundingClientRect().top);
+          view.site = site;
+          view.index = index;
+          enterStory(index);
+        });
+        timelineCards[index] = card;
+        section.append(card);
+      });
+    });
+
+    [oldest, 2000, 1000, latest].forEach((year, index) => {
+      const tick = createElement('span', 'history-tick', index === 0 ? '前 ' + year : String(year));
+      tick.style.left = position(year) + '%';
+      tick.dataset.edge = index === 0 ? 'start' : year === latest ? 'end' : 'middle';
+      scale.append(tick);
+    });
+    el('history-all').addEventListener('click', () => setTimelineFilter(false));
+    el('history-tombs').addEventListener('click', () => setTimelineFilter(true));
   }
 
   function mainSite(index) {
@@ -403,8 +526,20 @@
   }
 
   window.adventureMap = {
-    initialize(data, openChapter) {
+    initialize(data, eras, openChapter) {
       chapters = data;
+      chapterEras = eras;
+      initializeTimeline();
+      el('explore-nav').hidden = false;
+      el('chapter-history').hidden = false;
+      el('explore-map').addEventListener('click', () => {
+        if (!view.traveling && document.body.dataset.adventureView !== 'map') {
+          setExploreView('map');
+          renderMap();
+        }
+      });
+      el('explore-timeline').addEventListener('click', () => showTimeline());
+      el('chapter-history').addEventListener('click', () => showTimeline(view.index));
       enterStory = openChapter;
       el('adventure').hidden = false;
       el('adventure-return').hidden = false;
@@ -416,20 +551,29 @@
       el('adventure-valley').addEventListener('click', () => {
         if (!view.traveling) showMap('thebes', !view.valley);
       });
-      document.body.dataset.adventureView = 'map';
+      setExploreView('map');
       renderMap();
     },
     showStory(index) {
       if (!chapters) return false;
-      const openedFromMap = document.body.dataset.adventureView === 'map';
+      const openedFromExplorer = document.body.dataset.adventureView !== 'story';
       if (view.index !== index || !view.site) view.site = mainSite(index);
       view.index = index;
-      document.body.dataset.adventureView = 'story';
-      return openedFromMap;
+      setExploreView('story');
+      return openedFromExplorer;
     },
     updateChapter(index) {
-      if (chapters) renderSiteMedia(view.site ?? mainSite(index));
+      if (!chapters) return;
+      timelineCards.forEach((card, i) => {
+        if (i === index) card.setAttribute('aria-current', 'step');
+        else card.removeAttribute('aria-current');
+      });
+      const era = chapterEras.find(item => item.id === chapters[index].eraId);
+      el('chapter-history').textContent = era.label + ' · 第 ' + sceneNumber(index) + '／' + chapters.length + ' 幕 ↗';
+      el('chapter-history').setAttribute('aria-label', el('chapter-history').textContent + '，回時間線');
+      renderSiteMedia(view.site ?? mainSite(index));
     },
+    showTimeline,
     travelToStory
   };
 })();
