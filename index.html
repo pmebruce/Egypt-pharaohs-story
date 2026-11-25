@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
   <link rel="stylesheet" href="adventure.css?v=4" />
   <script src="adventure.js?v=4" defer></script>
+  <script src="pharaoh-depth.js" defer></script>
   <style>
     :root {
       --bg-paper: #FAF6EE;
@@ -157,6 +158,34 @@
     .spark-dot {
       cursor: pointer;
       transition: r 0.15s ease;
+    }
+    #pharaoh-depth summary {
+      cursor: pointer;
+      list-style: none;
+    }
+    #pharaoh-depth summary::-webkit-details-marker { display: none; }
+    #pharaoh-depth summary .depth-toggle::before { content: "展開 ＋"; }
+    #pharaoh-depth[open] summary .depth-toggle::before { content: "收起 −"; }
+    #pharaoh-depth-content section + section {
+      border-top: 1px solid #e8dbc5;
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+    #pharaoh-depth-content h4 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #15294a;
+      margin-bottom: .35rem;
+    }
+    #pharaoh-depth-content p {
+      font-size: 1.125rem;
+      line-height: 1.75;
+      color: #374151;
+    }
+    #pharaoh-depth-content a {
+      text-decoration: underline;
+      text-underline-offset: .18em;
+      overflow-wrap: anywhere;
     }
   </style>
 </head>
@@ -334,6 +363,14 @@
             <p id="narrative-legacy" class="text-[#374151]"></p>
           </div>
         </section>
+        <details id="pharaoh-depth" class="card-museum rounded-xl" hidden>
+          <summary class="flex min-h-14 items-center justify-between gap-2 rounded-xl px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A6526] sm:px-6">
+            <h3 class="font-serif-display text-xl font-bold text-[#15294A]">深入這一幕</h3>
+            <span class="depth-toggle shrink-0 text-sm font-semibold text-[#795323]" aria-hidden="true"></span>
+          </summary>
+          <div id="pharaoh-depth-content" class="px-5 pb-5 sm:px-6 sm:pb-6"></div>
+        </details>
+
         <section id="site-media" class="card-museum rounded-xl p-5 sm:p-6" hidden aria-labelledby="site-media-title">
           <h3 id="site-media-title" class="font-serif-display text-lg font-bold text-[#15294A]">遺跡與文物</h3>
           <div id="site-media-content" class="mt-2"></div>
@@ -654,7 +691,7 @@
         turningPoint: '將尼羅河谷的上埃及與三角洲的下埃及合而為一，確立延續三千年的雙冠王權與象形文字行政體系。',
         themes: ['unification', 'religion', 'reform'],
         inherited: '前王朝末期，尼羅河谷由上埃及（希拉孔波利斯一帶）與下埃及（三角洲地區）多個城邦與地方勢力分立，彼此透過河運貿易與軍事衝突爭奪主導權。',
-        choices: '那爾邁率領上埃及勢力北上統合三角洲，並在上下埃及交界處建立戰略據點孟菲斯，透過《那爾邁調色板》同時呈現紅冠與白冠，以宗教儀式與王權符號宣告南北一統。',
+        choices: '《那爾邁調色板》在兩面分別呈現他戴紅冠與白冠，將南北整合表達為王權主張。孟菲斯位於南北交界，後來成為重要行政中心，建城年代與創建者難以確認。',
         legacy: '奠定古埃及「兩地之主」的國家認同與中央行政雛形，並使早期象形文字正式成為紀錄王權、賦稅與歷史事件的工具。',
         quoteZh: '「上下埃及之王那爾邁，頭戴白冠擊潰北境之敵，再戴紅冠巡視統一後的兩地。」',
         quoteEn: 'Narmer, wearing the White Crown of Upper Egypt on one face and the Red Crown of Lower Egypt on the reverse of the Narmer Palette (c. 3100 BCE).',
@@ -662,7 +699,7 @@
         quoteUrl: 'https://www.worldhistory.org/egypt/',
         milestones: [
           { year: '約 3150 BCE', text: '統一上埃及與下埃及，結束前王朝時期並開啟第一王朝。' },
-          { year: '約 3120 BCE', text: '於南北交界處奠定孟菲斯行政重心，掌控尼羅河航運咽喉。' },
+          { year: '早王朝時期', text: '南北交界的孟菲斯地區逐漸成為行政重心，確切建城年代不明。' },
           { year: '約 3100 BCE', text: '葬於阿拜多斯烏姆・卡伯王陵區，成為早王朝法老聖地傳統。' }
         ],
         links: [
@@ -686,7 +723,7 @@
             sites: ['delta', 'memphis', 'abydos', 'thebes'],
             capitalSite: 'memphis',
             arcs: [['abydos', 'memphis'], ['memphis', 'delta']],
-            note: '完成上下埃及統一後，在三角洲頂端建立孟菲斯為統治中樞，貫通整條尼羅河谷。'
+            note: '三角洲南緣的孟菲斯地區連接上下埃及，早王朝的精確行政布局難以重建。'
           }
         }
       },
@@ -810,7 +847,7 @@
         capital: '孟菲斯',
         plateImg: PLATES.old,
         plateCaption: '第六王朝末期，王室金字塔規模大幅縮小，權力逐漸自孟菲斯流失至各州地方貴族。',
-        turningPoint: '超長統治後期因繼承人紛爭、氣候乾旱與地方州長（Nomarchs）世襲化，導致古王國中央體制瓦解。',
+        turningPoint: '長期在位期間，地方官員影響力上升。王位承繼、地方權力與環境壓力，都是研究古王國瓦解時會比較的因素。',
         themes: ['reform', 'diplomacy'],
         inherited: '佩皮二世年幼登基，初期由母后與外戚輔政；當時埃及仍維持對努比亞與遠方貿易（如象牙、烏木、香料）的派遺能力。',
         choices: '為維繫國內穩定，王室持續授予地方州長免稅特權與世襲職位，雖短期換取效忠，卻使中央財政與對地方的控制力不斷被侵蝕。',
@@ -845,7 +882,7 @@
             sites: ['memphis', 'abydos', 'thebes'],
             capitalSite: 'memphis',
             arcs: [['memphis', 'abydos']],
-            note: '任期末年各州州長形同割據，尼羅河低水位與饑荒更進一步動搖孟菲斯中央統治。'
+            note: '地方精英勢力逐步上升，孟菲斯王室對不同地區的控制程度有所變化。'
           }
         }
       },
@@ -1128,7 +1165,7 @@
         capital: '阿瑪納（阿赫塔頓）',
         plateImg: PLATES.ramesses,
         plateCaption: '新王國時期的巨型石雕與太陽神崇拜地景；阿肯那頓曾短暫以新都阿瑪納顛覆千年多神傳統。',
-        turningPoint: '關閉傳統阿蒙神廟、獨尊太陽圓盤「阿頓」（Aten）並遷都阿瑪納，發動人類歷史上最早的國家級一神教實驗。',
+        turningPoint: '將阿頓祭祀推到王室宗教的核心，遷都阿瑪納，改變神廟、王室圖像與宗教權力的關係。',
         themes: ['religion', 'reform', 'diplomacy'],
         inherited: '父親阿蒙霍特普三世留下空前繁榮的帝國，但底比斯的阿蒙祭司團財富與政治影響力已膨脹至足以制衡王權。',
         choices: '原名阿蒙霍特普四世的他更名為「阿肯那頓」，與王后娜芙蒂蒂在中埃及荒漠興建新都阿赫塔頓（今阿瑪納），並推動寫實、親密的「阿瑪納藝術風格」，大幅削弱傳統神職集團。',
@@ -1181,7 +1218,7 @@
         capital: '底比斯／孟菲斯',
         plateImg: PLATES.newk,
         plateCaption: '圖坦卡門重返底比斯與卡納克神廟體系，修復遭阿瑪納時期破壞的傳統神祇崇拜。',
-        turningPoint: '廢除阿肯那頓的一神教改革、遷離阿瑪納並全面恢復傳統多神秩序；三千年後其幾乎未被盜掘的陵墓成為考古奇蹟。',
+        turningPoint: '朝廷撤離阿瑪納，重新資助阿蒙與傳統神廟。三千多年後，相對完整的 KV62 王陵留下大量生活與祭儀器物。',
         themes: ['religion', 'succession', 'monuments'],
         inherited: '年約九歲即位，接手的是宗教撕裂、傳統神廟荒廢、外交威信受損的後阿瑪納危機局面。',
         choices: '在大臣阿伊與將軍霍倫海布輔佐下，少年法老將原名「圖坦卡頓」改為「圖坦卡門」，頒布《復辟碑》宣布重開阿蒙與諸神神廟，並將宮廷遷回孟菲斯與底比斯。',
@@ -1227,14 +1264,14 @@
         dynasty: '第十九王朝',
         nameZh: '拉美西斯二世',
         nameEn: 'Ramesses II',
-        epithet: '拉美西斯大帝，卡迭石戰役主角、史上首份和平條約締約者',
+        epithet: '拉美西斯大帝，卡迭石戰役主角、埃及與西臺和約締約者',
         yearsText: '1279–1213 BCE',
         startBce: 1279,
         reignYears: 66,
         capital: '培爾—拉美西斯（東三角洲）',
         plateImg: PLATES.ramesses,
         plateCaption: '阿布辛貝岩窟神廟的四尊拉美西斯二世巨像，矗立於尼羅河畔展現帝國威儀。',
-        turningPoint: '在卡迭石與西臺帝國激戰後，於西元前 1259 年簽訂人類史上首份存世的跨國書面和平條約，開創數十年繁榮建設期。',
+        turningPoint: '在卡迭石與西臺帝國激戰後，於西元前 1259 年簽訂現存最早的一批跨國書面和平條約之一，開創數十年繁榮建設期。',
         themes: ['diplomacy', 'monuments', 'warfare'],
         inherited: '父親塞提一世已重振軍威，但新興的安納托利亞強權西臺帝國正與埃及激烈爭奪敘利亞與黎凡特控制權。',
         choices: '拉美西斯二世於東三角洲興建新都培爾—拉美西斯以貼近西亞前線；卡迭石戰役陷入僵局後，他展現務實外交手腕與西臺簽署《埃及—西臺和約》並聯姻，並將龐大國力投入阿布辛貝、拉美西姆與卡納克柱廳等建築工程。',
@@ -1492,7 +1529,7 @@
         dynasty: '托勒密王朝',
         nameZh: '克麗奧佩脫拉七世',
         nameEn: 'Cleopatra VII',
-        epithet: '古埃及最後一位實權女法老，在羅馬帝國崛起浪潮中力挽狂瀾',
+        epithet: '古埃及最後一位實權女法老，在羅馬擴張浪潮中力挽狂瀾',
         yearsText: '51–30 BCE',
         startBce: 51,
         reignYears: 21,
@@ -1503,7 +1540,7 @@
         themes: ['succession', 'diplomacy', 'transition'],
         inherited: '托勒密王朝後期深陷王室兄妹內鬥與國債危機，而羅馬共和國的軍事勢力已成為東地中海無可匹敵的主宰。',
         choices: '克麗奧佩脫拉七世以卓越的外交與經濟手腕重整國內財政，先後結盟尤利烏斯・凱撒與馬克・安東尼，試圖借助羅馬內部勢力重振托勒密王國在地中海東岸的版圖與獨立地位。',
-        legacy: '西元前 31 年亞克興海戰敗北、前 30 年自盡後，埃及正式併入羅馬帝國成為行省，延續超過三千年的古埃及法老時代就此畫下句點。',
+        legacy: '西元前 31 年亞克興海戰敗北、前 30 年自盡後，埃及正式成為羅馬的行省，延續超過三千年的古埃及法老時代就此畫下句點。',
         quoteZh: '「她不僅以機智與學識折服眾人，更是整個托勒密王室中第一位能直接用埃及語與子民對話的統治者。」',
         quoteEn: 'Plutarch’s Life of Antony highlights Cleopatra VII’s multilingual diplomacy and her unique fluency in the Egyptian language among Ptolemaic rulers.',
         quoteSource: '普魯塔克《希臘羅馬名人傳・安東尼傳》記載',
@@ -1534,7 +1571,7 @@
             sites: ['delta', 'memphis', 'thebes', 'megiddo'],
             capitalSite: 'delta',
             arcs: [['delta', 'megiddo'], ['delta', 'thebes']],
-            note: '透過與安東尼結盟短暫重振東地中海勢力，最終於西元前 30 年併入羅馬帝國。'
+            note: '透過與安東尼結盟短暫重振東地中海勢力，最終於西元前 30 年納入羅馬統治。'
           }
         }
       }
@@ -2197,6 +2234,7 @@
     function renderAll() {
       const idx = state.currentIndex;
       const p = PHARAOHS[idx];
+      window.renderPharaohDepth?.(p);
       const era = getEraById(p.eraId);
 
       // Era tabs active state
@@ -2400,6 +2438,7 @@
     renderAll();
     loadWorldAtlas();
     document.addEventListener('DOMContentLoaded', () => {
+      window.renderPharaohDepth?.(PHARAOHS[state.currentIndex]);
       window.adventureMap?.initialize(PHARAOHS, ERAS, index => {
         goToScene(index, { scroll: true });
         elStageHeading.focus({ preventScroll: true });
