@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#17110e" />
   <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon-180.png" />
   <title>古埃及史：法老與時代（約 3150 BCE — 30 BCE）</title>
@@ -14,17 +15,20 @@
   <script src="pharaoh-depth.js" defer></script>
   <style>
     :root {
-      --bg-paper: #FAF6EE;
-      --bg-card: #FFFFFF;
-      --bg-subtle: #F3ECE0;
-      --navy-deep: #15294A;
-      --navy-mid: #1E3A63;
-      --gold-warm: #C5963B;
-      --gold-light: #E8D5A7;
-      --terracotta: #A63A2B;
-      --ink-main: #1F2937;
-      --ink-muted: #57606F;
-      --border-soft: #E5DCCB;
+      color-scheme: dark;
+      --bg-paper: #17110e;
+      --bg-card: #2d1e16;
+      --bg-subtle: #38271c;
+      --bg-control: #251a14;
+      --bg-hover: #4b3324;
+      --bg-selected: #49301e;
+      --gold-warm: #ecc383;
+      --gold-hover: #ffdb9e;
+      --ink-on-gold: #2c1c10;
+      --ink-main: #f7ebdd;
+      --ink-muted: #dcc3a6;
+      --border-soft: #77553a;
+      --border-strong: #a98055;
       --font-sans: system-ui, -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       --font-serif: Georgia, "Noto Serif TC", "Songti TC", "PMingLiU", serif;
     }
@@ -45,7 +49,7 @@
     .card-museum {
       background-color: var(--bg-card);
       border: 1px solid var(--border-soft);
-      box-shadow: 0 2px 10px rgba(21, 41, 74, 0.04);
+      box-shadow: 0 2px 10px #0a070652;
     }
 
     .era-tab {
@@ -54,7 +58,7 @@
 
     .era-tab.active {
       background-color: var(--gold-warm);
-      color: var(--navy-deep);
+      color: var(--ink-on-gold);
       border-color: var(--gold-warm);
       box-shadow: 0 2px 8px rgba(197, 150, 59, 0.35);
     }
@@ -68,9 +72,9 @@
     }
 
     .theme-pill.active {
-      background-color: var(--navy-deep);
+      background-color: var(--ink-on-gold);
       color: #FFFFFF;
-      border-color: var(--navy-deep);
+      border-color: var(--ink-on-gold);
     }
 
     input[type="range"].timeline-slider {
@@ -78,7 +82,7 @@
       appearance: none;
       height: 8px;
       border-radius: 999px;
-      background: #E2D7C3;
+      background: var(--border-strong);
       outline: none;
     }
 
@@ -89,8 +93,8 @@
       height: 22px;
       border-radius: 50%;
       background: var(--gold-warm);
-      border: 3px solid #FFFFFF;
-      box-shadow: 0 1px 6px rgba(21, 41, 74, 0.35);
+      border: 3px solid var(--ink-on-gold);
+      box-shadow: 0 1px 6px #120b08a0;
       cursor: pointer;
     }
 
@@ -99,8 +103,8 @@
       height: 22px;
       border-radius: 50%;
       background: var(--gold-warm);
-      border: 3px solid #FFFFFF;
-      box-shadow: 0 1px 6px rgba(21, 41, 74, 0.35);
+      border: 3px solid var(--ink-on-gold);
+      box-shadow: 0 1px 6px #120b08a0;
       cursor: pointer;
     }
 
@@ -114,7 +118,7 @@
     .map-tooltip {
       position: absolute;
       pointer-events: none;
-      background: rgba(21, 41, 74, 0.94);
+      background: #21150ff5;
       color: #FFFFFF;
       padding: 6px 10px;
       border-radius: 6px;
@@ -159,6 +163,16 @@
       cursor: pointer;
       transition: r 0.15s ease;
     }
+    #pharaoh-depth {
+      background-color: var(--bg-subtle);
+    }
+    #site-media figure { border-color: var(--border-soft); }
+    #site-media a, #pharaoh-depth-content a { color: var(--gold-warm); }
+    .timeline-slider:focus-visible {
+      outline: 2px solid var(--gold-warm);
+      outline-offset: 4px;
+    }
+
     #pharaoh-depth summary {
       cursor: pointer;
       list-style: none;
@@ -167,20 +181,20 @@
     #pharaoh-depth summary .depth-toggle::before { content: "展開 ＋"; }
     #pharaoh-depth[open] summary .depth-toggle::before { content: "收起 −"; }
     #pharaoh-depth-content section + section {
-      border-top: 1px solid #e8dbc5;
+      border-top: 1px solid var(--border-soft);
       padding-top: 1rem;
       margin-top: 1rem;
     }
     #pharaoh-depth-content h4 {
       font-size: 1.125rem;
       font-weight: 700;
-      color: #15294a;
+      color: var(--gold-warm);
       margin-bottom: .35rem;
     }
     #pharaoh-depth-content p {
       font-size: 1.125rem;
       line-height: 1.75;
-      color: #374151;
+      color: var(--ink-main);
     }
     #pharaoh-depth-content a {
       text-decoration: underline;
@@ -192,7 +206,7 @@
 <body class="antialiased">
 
   <!-- Header & Era Navigation -->
-  <header id="site-header" class="bg-[#15294A] text-white border-b-4 border-[#C5963B]">
+  <header id="site-header" class="bg-[color:var(--bg-control)] text-white border-b-4 border-[color:var(--gold-warm)]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div class="flex items-center gap-3">
@@ -202,11 +216,11 @@
               <h1 class="font-serif-display text-2xl sm:text-[1.75rem] font-bold tracking-wide text-white">
                 古埃及史：法老與時代
               </h1>
-              <span class="text-sm px-2 py-0.5 rounded bg-white/10 text-[#E8D5A7] border border-white/15">
+              <span class="text-sm px-2 py-0.5 rounded bg-white/10 text-[color:var(--gold-warm)] border border-white/15">
                 約 3150 BCE — 30 BCE
               </span>
             </div>
-            <p class="text-sm sm:text-base text-slate-300 mt-0.5">
+            <p class="text-sm sm:text-base text-[color:var(--ink-muted)] mt-0.5">
               從上下埃及統一，到托勒密王朝的最後落幕
             </p>
           </div>
@@ -215,15 +229,15 @@
           <button id="btn-jump-timeline" type="button" class="text-base min-h-11 px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-slate-100 border border-white/15 transition">
             時間軸
           </button>
-          <button id="btn-jump-themes" type="button" class="text-base min-h-11 px-3 py-1.5 rounded-md bg-[#C5963B] hover:bg-[#B3852E] text-[#15294A] font-medium transition shadow-sm">
+          <button id="btn-jump-themes" type="button" class="text-base min-h-11 px-3 py-1.5 rounded-md bg-[color:var(--gold-warm)] hover:bg-[color:var(--gold-hover)] text-[color:var(--ink-on-gold)] font-medium transition shadow-sm">
             主題脈絡
           </button>
         </div>
       </div>
 
       <button id="btn-resume-reading" type="button" hidden
-        class="mb-4 min-h-11 rounded-md border border-[#C5963B] bg-white/10 px-3 py-2 text-left text-base text-white hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E8D5A7]">
-        繼續上次閱讀<span id="resume-chapter" class="ml-2 text-[#E8D5A7]"></span>
+        class="mb-4 min-h-11 rounded-md border border-[color:var(--gold-warm)] bg-white/10 px-3 py-2 text-left text-base text-white hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E8D5A7]">
+        繼續上次閱讀<span id="resume-chapter" class="ml-2 text-[color:var(--gold-warm)]"></span>
       </button>
 
       <!-- Balanced 4x2 Era Tabs -->
@@ -284,18 +298,18 @@
   </main>
 
   <!-- Selector Bar -->
-  <div id="chapter-selector" class="bg-[#F3ECE0] border-b border-[#E5DCCB] sticky top-0 z-30">
+  <div id="chapter-selector" class="bg-[color:var(--bg-subtle)] border-b border-[color:var(--border-soft)] sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2.5 flex-1 min-w-0">
-        <label for="pharaoh-select" class="sr-only sm:not-sr-only text-sm font-semibold text-[#57606F] shrink-0">
+        <label for="pharaoh-select" class="sr-only sm:not-sr-only text-sm font-semibold text-[color:var(--ink-muted)] shrink-0">
           人物與任期
         </label>
-        <select id="pharaoh-select" class="flex-1 min-w-0 max-w-md min-h-11 bg-white border border-[#D8CCB8] rounded-md px-3 py-1.5 text-base text-[#1F2937] font-medium focus:outline-none focus:ring-2 focus:ring-[#C5963B]"></select>
+        <select id="pharaoh-select" class="flex-1 min-w-0 max-w-md min-h-11 bg-[color:var(--bg-control)] border border-[color:var(--border-soft)] rounded-md px-3 py-1.5 text-base text-[color:var(--ink-main)] font-medium focus:outline-none focus:ring-2 focus:ring-[#C5963B]"></select>
       </div>
       <div class="flex items-center gap-3 text-xs sm:text-sm">
-        <span class="hidden sm:inline text-[#57606F]">鍵盤 <kbd class="px-1.5 py-0.5 bg-white border border-[#D8CCB8] rounded text-[11px]">←</kbd> <kbd class="px-1.5 py-0.5 bg-white border border-[#D8CCB8] rounded text-[11px]">→</kbd> 切換</span>
-        <button id="adventure-return" type="button" class="min-h-11 whitespace-nowrap rounded-md border border-[#B99862] bg-white px-2.5 text-sm font-semibold text-[#15294A]" hidden>回地圖</button>
-        <span id="scene-counter" class="font-mono font-bold text-[#15294A] bg-white px-2.5 py-1 rounded border border-[#D8CCB8]">
+        <span class="hidden sm:inline text-[color:var(--ink-muted)]">鍵盤 <kbd class="px-1.5 py-0.5 bg-[color:var(--bg-control)] border border-[color:var(--border-soft)] rounded text-[11px]">←</kbd> <kbd class="px-1.5 py-0.5 bg-[color:var(--bg-control)] border border-[color:var(--border-soft)] rounded text-[11px]">→</kbd> 切換</span>
+        <button id="adventure-return" type="button" class="min-h-11 whitespace-nowrap rounded-md border border-[color:var(--border-strong)] bg-[color:var(--bg-control)] px-2.5 text-sm font-semibold text-[color:var(--ink-main)]" hidden>回地圖</button>
+        <span id="scene-counter" class="font-mono font-bold text-[color:var(--ink-main)] bg-[color:var(--bg-control)] px-2.5 py-1 rounded border border-[color:var(--border-soft)]">
           01 / 17
         </span>
       </div>
@@ -312,16 +326,16 @@
       </div>
       <div class="relative z-10 max-w-3xl">
         <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm mb-2">
-          <span id="stage-era-badge" class="px-2.5 py-0.5 rounded-full bg-[#15294A] text-white font-medium"></span>
-          <span id="stage-dynasty-badge" class="px-2.5 py-0.5 rounded-full bg-[#F3ECE0] text-[#7A5415] border border-[#E2D3B3] font-medium"></span>
-          <span id="stage-years" class="font-mono font-semibold text-[#A63A2B]"></span>
+          <span id="stage-era-badge" class="px-2.5 py-0.5 rounded-full bg-[color:var(--bg-control)] text-white font-medium"></span>
+          <span id="stage-dynasty-badge" class="px-2.5 py-0.5 rounded-full bg-[color:var(--bg-subtle)] text-[color:var(--gold-warm)] border border-[color:var(--border-soft)] font-medium"></span>
+          <span id="stage-years" class="font-mono font-semibold text-[color:var(--gold-warm)]"></span>
         </div>
-        <h2 id="stage-heading" tabindex="-1" class="font-serif-display text-3xl sm:text-4xl font-bold text-[#15294A] tracking-tight">
+        <h2 id="stage-heading" tabindex="-1" class="font-serif-display text-3xl sm:text-4xl font-bold text-[color:var(--ink-main)] tracking-tight">
           <span id="stage-name-zh"></span>
-          <span id="stage-name-en" class="block sm:inline text-lg sm:text-2xl font-normal text-[#57606F] sm:ml-2"></span>
+          <span id="stage-name-en" class="block sm:inline text-lg sm:text-2xl font-normal text-[color:var(--ink-muted)] sm:ml-2"></span>
         </h2>
-        <button id="chapter-history" class="min-h-11 rounded-md border border-[#AF8552] bg-[#FFF6E5] px-3 text-sm font-semibold text-[#603825]" type="button" hidden></button>
-        <p id="stage-epithet" class="text-lg text-[#57606F] mt-1.5 leading-relaxed"></p>
+        <button id="chapter-history" class="min-h-11 rounded-md border border-[color:var(--border-strong)] bg-[color:var(--bg-selected)] px-3 text-sm font-semibold text-[color:var(--gold-warm)]" type="button" hidden></button>
+        <p id="stage-epithet" class="text-lg text-[color:var(--ink-muted)] mt-1.5 leading-relaxed"></p>
       </div>
     </section>
 
@@ -330,10 +344,10 @@
       <div class="min-w-0 space-y-6 lg:col-start-6 lg:col-span-7 lg:row-start-1">
         <!-- Historical Turning Point & Theme Tags -->
         <section class="card-museum rounded-xl p-5 sm:p-6 border-l-4 border-l-[#C5963B]">
-          <div class="text-sm font-bold tracking-wider text-[#7A5415] mb-1.5">
+          <div class="text-sm font-bold tracking-wider text-[color:var(--gold-warm)] mb-1.5">
             這一任的歷史轉折
           </div>
-          <p id="stage-turning-point" class="font-serif-display text-xl sm:text-2xl font-bold text-[#15294A] leading-snug"></p>
+          <p id="stage-turning-point" class="font-serif-display text-xl sm:text-2xl font-bold text-[color:var(--ink-main)] leading-snug"></p>
           <div id="stage-theme-tags" class="flex flex-wrap gap-2 mt-3.5"></div>
         </section>
 
@@ -341,38 +355,38 @@
         <section class="card-museum rounded-xl p-5 sm:p-6 space-y-5">
           <div>
             <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#15294A] text-white">01</span>
-              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">接下什麼局面</h3>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[color:var(--bg-control)] text-white">01</span>
+              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[color:var(--ink-main)]">接下什麼局面</h3>
             </div>
-            <p id="narrative-inherited" class="text-[#374151]"></p>
+            <p id="narrative-inherited" class="text-[color:var(--ink-main)]"></p>
           </div>
 
-          <div class="pt-4 border-t border-[#EFE7D8]">
+          <div class="pt-4 border-t border-[color:var(--border-soft)]">
             <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#C5963B] text-white">02</span>
-              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">做了什麼選擇</h3>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[color:var(--gold-warm)] text-[color:var(--ink-on-gold)]">02</span>
+              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[color:var(--ink-main)]">做了什麼選擇</h3>
             </div>
-            <p id="narrative-choices" class="text-[#374151]"></p>
+            <p id="narrative-choices" class="text-[color:var(--ink-main)]"></p>
           </div>
 
-          <div class="pt-4 border-t border-[#EFE7D8]">
+          <div class="pt-4 border-t border-[color:var(--border-soft)]">
             <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#A63A2B] text-white">03</span>
-              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[#15294A]">留下什麼影響</h3>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[color:var(--bg-selected)] text-white">03</span>
+              <h3 class="font-serif-display text-lg sm:text-xl font-bold text-[color:var(--ink-main)]">留下什麼影響</h3>
             </div>
-            <p id="narrative-legacy" class="text-[#374151]"></p>
+            <p id="narrative-legacy" class="text-[color:var(--ink-main)]"></p>
           </div>
         </section>
         <details id="pharaoh-depth" class="card-museum rounded-xl" hidden>
           <summary class="flex min-h-14 items-center justify-between gap-2 rounded-xl px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A6526] sm:px-6">
-            <h3 class="font-serif-display text-xl font-bold text-[#15294A]">深入這一幕</h3>
-            <span class="depth-toggle shrink-0 text-sm font-semibold text-[#795323]" aria-hidden="true"></span>
+            <h3 class="font-serif-display text-xl font-bold text-[color:var(--ink-main)]">深入這一幕</h3>
+            <span class="depth-toggle shrink-0 text-sm font-semibold text-[color:var(--gold-warm)]" aria-hidden="true"></span>
           </summary>
           <div id="pharaoh-depth-content" class="px-5 pb-5 sm:px-6 sm:pb-6"></div>
         </details>
 
         <section id="site-media" class="card-museum rounded-xl p-5 sm:p-6" hidden aria-labelledby="site-media-title">
-          <h3 id="site-media-title" class="font-serif-display text-lg font-bold text-[#15294A]">遺跡與文物</h3>
+          <h3 id="site-media-title" class="font-serif-display text-lg font-bold text-[color:var(--ink-main)]">遺跡與文物</h3>
           <div id="site-media-content" class="mt-2"></div>
         </section>
       </div>
@@ -380,15 +394,15 @@
       <div class="min-w-0 space-y-6 lg:col-start-1 lg:col-span-5 lg:row-start-1 lg:row-span-2">
         <!-- Archival Illustration Plate -->
         <section class="card-museum rounded-xl overflow-hidden">
-          <div class="relative bg-[#EDE5D5] aspect-[4/3] overflow-hidden group cursor-pointer" id="plate-container" role="button" tabindex="0" aria-label="放大檢視歷史插畫">
+          <div class="relative bg-[color:var(--bg-control)] aspect-[4/3] overflow-hidden group cursor-pointer" id="plate-container" role="button" tabindex="0" aria-label="放大檢視歷史插畫">
             <img id="stage-plate-img" src="" alt="" class="w-full h-full object-cover transition duration-300 group-hover:scale-[1.02]" />
-            <div class="absolute bottom-2.5 right-2.5 bg-[#15294A]/85 text-white text-xs px-2.5 py-1 rounded-md backdrop-blur-sm">
+            <div class="absolute bottom-2.5 right-2.5 bg-[#21150F]/85 text-white text-xs px-2.5 py-1 rounded-md backdrop-blur-sm">
               點擊放大檢視
             </div>
           </div>
-          <div class="p-4 bg-[#FCF9F3] border-t border-[#E5DCCB]">
-            <p id="stage-plate-caption" class="text-base text-[#374151] leading-relaxed"></p>
-            <p class="text-sm text-[#6B7280] mt-1">
+          <div class="p-4 bg-[color:var(--bg-control)] border-t border-[color:var(--border-soft)]">
+            <p id="stage-plate-caption" class="text-base text-[color:var(--ink-main)] leading-relaxed"></p>
+            <p class="text-sm text-[color:var(--ink-muted)] mt-1">
               典藏風格歷史意象圖版（依該時期代表遺址與建築特徵繪製）
             </p>
           </div>
@@ -398,12 +412,12 @@
         <section class="card-museum rounded-xl p-4 sm:p-5">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div>
-              <h3 class="font-serif-display text-lg font-bold text-[#15294A]">
+              <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)]">
                 這一任的埃及疆域與重心
               </h3>
-              <p id="map-subtitle" class="text-sm text-[#57606F] mt-0.5"></p>
+              <p id="map-subtitle" class="text-sm text-[color:var(--ink-muted)] mt-0.5"></p>
             </div>
-            <div class="inline-flex rounded-md border border-[#D8CCB8] bg-[#F3ECE0] p-0.5 text-sm">
+            <div class="inline-flex rounded-md border border-[color:var(--border-soft)] bg-[color:var(--bg-subtle)] p-0.5 text-sm">
               <button id="btn-map-start" type="button" class="px-2.5 py-1 rounded font-medium transition">
                 任初
               </button>
@@ -413,51 +427,51 @@
             </div>
           </div>
 
-          <div id="egypt-map-wrap" class="relative w-full h-[320px] rounded-lg overflow-hidden bg-[#DCE8F2] border border-[#D8CCB8]">
+          <div id="egypt-map-wrap" class="relative w-full h-[320px] rounded-lg overflow-hidden bg-[color:var(--bg-control)] border border-[color:var(--border-soft)]">
             <svg id="egypt-map-svg" class="w-full h-full block"></svg>
             <div id="map-tooltip" class="map-tooltip"></div>
           </div>
 
-          <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-[#57606F]">
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-[color:var(--ink-muted)]">
             <div class="flex flex-wrap items-center gap-3">
               <span class="inline-flex items-center gap-1.5">
-                <span class="w-3 h-3 rounded-sm bg-[#D9B464] border border-[#9E7524] inline-block"></span>核心統治區
+                <span class="w-3 h-3 rounded-sm bg-[#A87842] border border-[#E5B071] inline-block"></span>核心統治區
               </span>
               <span class="inline-flex items-center gap-1.5">
-                <span class="w-3 h-3 rounded-sm bg-[#E5C9A8] border border-[#A63A2B] inline-block"></span>勢力／遠征範圍
+                <span class="w-3 h-3 rounded-sm bg-[#78533C] border border-[#BD8F70] inline-block"></span>勢力／遠征範圍
               </span>
               <span class="inline-flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#A63A2B] inline-block"></span>都城與關鍵地點
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FFAD72] inline-block"></span>都城與關鍵地點
               </span>
             </div>
-            <span class="text-[10px] text-[#6B7280]">底圖：Natural Earth</span>
+            <span class="text-[10px] text-[color:var(--ink-muted)]">底圖：Natural Earth</span>
           </div>
-          <p id="map-note" class="mt-2.5 text-base text-[#374151] bg-[#FAF6EE] border border-[#E5DCCB] rounded-md px-3 py-2 leading-relaxed"></p>
+          <p id="map-note" class="mt-2.5 text-base text-[color:var(--ink-main)] bg-[color:var(--bg-subtle)] border border-[color:var(--border-soft)] rounded-md px-3 py-2 leading-relaxed"></p>
         </section>
 
         <!-- Data & Sparkline Card -->
         <section class="card-museum rounded-xl p-4 sm:p-5 space-y-4">
-          <h3 class="font-serif-display text-lg font-bold text-[#15294A]">
+          <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)]">
             任期數據與三千年縱軸
           </h3>
           <div class="grid grid-cols-2 gap-3">
-            <div class="bg-[#FAF6EE] border border-[#E5DCCB] rounded-lg p-3">
-              <div class="text-sm text-[#57606F]">政治中樞（都城）</div>
-              <div id="stat-capital" class="text-sm font-bold text-[#15294A] mt-0.5"></div>
+            <div class="bg-[color:var(--bg-subtle)] border border-[color:var(--border-soft)] rounded-lg p-3">
+              <div class="text-sm text-[color:var(--ink-muted)]">政治中樞（都城）</div>
+              <div id="stat-capital" class="text-sm font-bold text-[color:var(--ink-main)] mt-0.5"></div>
             </div>
-            <div class="bg-[#FAF6EE] border border-[#E5DCCB] rounded-lg p-3">
-              <div class="text-sm text-[#57606F]">估計在位年數</div>
-              <div id="stat-duration" class="text-sm font-bold text-[#A63A2B] mt-0.5"></div>
+            <div class="bg-[color:var(--bg-subtle)] border border-[color:var(--border-soft)] rounded-lg p-3">
+              <div class="text-sm text-[color:var(--ink-muted)]">估計在位年數</div>
+              <div id="stat-duration" class="text-sm font-bold text-[color:var(--gold-warm)] mt-0.5"></div>
             </div>
           </div>
 
           <!-- Reign Length Sparkline -->
           <div>
             <div class="flex items-center justify-between text-xs mb-1">
-              <span class="font-medium text-[#374151]">17 幕代表法老在位年數比較</span>
-              <span id="spark-reign-label" class="font-mono text-[#A63A2B] font-semibold"></span>
+              <span class="font-medium text-[color:var(--ink-main)]">17 幕代表法老在位年數比較</span>
+              <span id="spark-reign-label" class="font-mono text-[color:var(--gold-warm)] font-semibold"></span>
             </div>
-            <div class="bg-[#FCF9F3] border border-[#E5DCCB] rounded-lg p-2">
+            <div class="bg-[color:var(--bg-control)] border border-[color:var(--border-soft)] rounded-lg p-2">
               <svg id="sparkline-reign" class="w-full h-16 block" viewBox="0 0 360 64" preserveAspectRatio="none"></svg>
             </div>
           </div>
@@ -465,13 +479,13 @@
           <!-- Era Position Sparkline -->
           <div>
             <div class="flex items-center justify-between text-xs mb-1">
-              <span class="font-medium text-[#374151]">在古埃及三千年縱軸上的位置</span>
-              <span id="spark-year-label" class="font-mono text-[#15294A] font-semibold"></span>
+              <span class="font-medium text-[color:var(--ink-main)]">在古埃及三千年縱軸上的位置</span>
+              <span id="spark-year-label" class="font-mono text-[color:var(--ink-main)] font-semibold"></span>
             </div>
-            <div class="bg-[#FCF9F3] border border-[#E5DCCB] rounded-lg p-2">
+            <div class="bg-[color:var(--bg-control)] border border-[color:var(--border-soft)] rounded-lg p-2">
               <svg id="sparkline-era" class="w-full h-14 block" viewBox="0 0 360 56" preserveAspectRatio="none"></svg>
             </div>
-            <p class="text-sm text-[#6B7280] mt-1">
+            <p class="text-sm text-[color:var(--ink-muted)] mt-1">
               點擊折線圖上的任意圓點，可直接跳轉至對應法老。
             </p>
           </div>
@@ -480,20 +494,20 @@
 
       <div class="min-w-0 space-y-6 lg:col-start-6 lg:col-span-7 lg:row-start-2">
         <!-- Primary Inscription / Source Quote -->
-        <section class="card-museum rounded-xl p-5 sm:p-6 bg-[#FCF9F3]">
+        <section class="card-museum rounded-xl p-5 sm:p-6 bg-[color:var(--bg-control)]">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-            <h3 class="font-serif-display text-lg font-bold text-[#15294A]">
+            <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)]">
               碑銘與歷史文獻摘句
             </h3>
-            <span class="text-[11px] px-2 py-0.5 rounded bg-[#F3ECE0] text-[#7A5415] border border-[#E2D3B3]">
+            <span class="text-[11px] px-2 py-0.5 rounded bg-[color:var(--bg-subtle)] text-[color:var(--gold-warm)] border border-[color:var(--border-soft)]">
               本站編譯
             </span>
           </div>
-          <blockquote id="quote-zh" class="font-serif-display text-lg text-[#1F2937] leading-relaxed pl-3.5 border-l-3 border-[#C5963B]" style="border-left-width: 3px;"></blockquote>
-          <p id="quote-en" class="text-sm sm:text-base text-[#57606F] italic mt-2.5 leading-relaxed"></p>
-          <div class="mt-3 text-xs text-[#57606F] flex flex-wrap items-center justify-between gap-2">
+          <blockquote id="quote-zh" class="font-serif-display text-lg text-[color:var(--ink-main)] leading-relaxed pl-3.5 border-l-3 border-[color:var(--gold-warm)]" style="border-left-width: 3px;"></blockquote>
+          <p id="quote-en" class="text-sm sm:text-base text-[color:var(--ink-muted)] italic mt-2.5 leading-relaxed"></p>
+          <div class="mt-3 text-xs text-[color:var(--ink-muted)] flex flex-wrap items-center justify-between gap-2">
             <span id="quote-source-title"></span>
-            <a id="quote-source-link" href="#" target="_blank" rel="noopener noreferrer" class="text-[#15294A] underline hover:text-[#A63A2B] font-medium">
+            <a id="quote-source-link" href="#" target="_blank" rel="noopener noreferrer" class="text-[color:var(--ink-main)] underline hover:text-[color:var(--gold-warm)] font-medium">
               檢視參考文獻 ↗
             </a>
           </div>
@@ -501,7 +515,7 @@
 
         <!-- 3 Key Milestones -->
         <section class="card-museum rounded-xl p-5 sm:p-6">
-          <h3 class="font-serif-display text-lg font-bold text-[#15294A] mb-3.5">
+          <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)] mb-3.5">
             三個關鍵時間節點
           </h3>
           <div id="stage-milestones" class="space-y-3"></div>
@@ -509,7 +523,7 @@
 
         <!-- Further Reading -->
         <section class="card-museum rounded-xl p-5 sm:p-6">
-          <h3 class="font-serif-display text-lg font-bold text-[#15294A] mb-3">
+          <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)] mb-3">
             史料與延伸閱讀
           </h3>
           <div id="stage-links" class="flex flex-wrap gap-2.5"></div>
@@ -521,22 +535,22 @@
     <section id="timeline-section" class="card-museum rounded-xl p-5 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div>
-          <h3 class="font-serif-display text-lg font-bold text-[#15294A]">歷史時間軸（約 3150 BCE — 30 BCE）</h3>
-          <p class="text-sm text-[#57606F] mt-0.5">點擊下方時期色帶或拖曳滑桿，快速跨越三千年王朝更迭</p>
+          <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)]">歷史時間軸（約 3150 BCE — 30 BCE）</h3>
+          <p class="text-sm text-[color:var(--ink-muted)] mt-0.5">點擊下方時期色帶或拖曳滑桿，快速跨越三千年王朝更迭</p>
         </div>
-        <span id="timeline-active-label" class="text-xs sm:text-sm font-semibold text-[#A63A2B] bg-[#FAF6EE] px-3 py-1 rounded-full border border-[#E5DCCB]"></span>
+        <span id="timeline-active-label" class="text-xs sm:text-sm font-semibold text-[color:var(--gold-warm)] bg-[color:var(--bg-subtle)] px-3 py-1 rounded-full border border-[color:var(--border-soft)]"></span>
       </div>
 
       <!-- Era Color Ribbon -->
-      <div id="timeline-ribbon" class="flex w-full h-11 rounded-lg overflow-hidden border border-[#D8CCB8] mb-3"></div>
+      <div id="timeline-ribbon" class="flex w-full h-11 rounded-lg overflow-hidden border border-[color:var(--border-soft)] mb-3"></div>
 
       <!-- Legend for Eras -->
-      <div id="timeline-legend" class="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-[#57606F] mb-4"></div>
+      <div id="timeline-legend" class="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-[color:var(--ink-muted)] mb-4"></div>
 
       <!-- Slider -->
       <div class="space-y-2">
         <input id="timeline-slider" type="range" min="0" max="16" value="0" class="w-full timeline-slider" aria-label="時間軸滑桿" />
-        <div class="grid grid-cols-3 gap-2 text-xs sm:text-sm text-[#57606F] [&>span:nth-child(2)]:text-center [&>span:last-child]:text-right">
+        <div class="grid grid-cols-3 gap-2 text-xs sm:text-sm text-[color:var(--ink-muted)] [&>span:nth-child(2)]:text-center [&>span:last-child]:text-right">
           <span>約 3150 BCE（那爾邁）</span>
           <span>約 1479 BCE（新王國巔峰）</span>
           <span>30 BCE（克麗奧佩脫拉七世）</span>
@@ -548,14 +562,14 @@
     <section id="thematic-section" class="card-museum rounded-xl p-5 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
-          <h3 class="font-serif-display text-lg font-bold text-[#15294A]">主題脈絡篩選</h3>
-          <p class="text-sm text-[#57606F] mt-0.5">依歷史主線跨王朝串聯閱讀，觀察制度、信仰與帝國疆域的演變</p>
+          <h3 class="font-serif-display text-lg font-bold text-[color:var(--ink-main)]">主題脈絡篩選</h3>
+          <p class="text-sm text-[color:var(--ink-muted)] mt-0.5">依歷史主線跨王朝串聯閱讀，觀察制度、信仰與帝國疆域的演變</p>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btn-theme-prev" type="button" class="text-sm min-h-11 px-3 py-1.5 rounded-md border border-[#D8CCB8] bg-[#FAF6EE] hover:bg-[#EFE6D5] text-[#15294A] font-medium transition">
+          <button id="btn-theme-prev" type="button" class="text-sm min-h-11 px-3 py-1.5 rounded-md border border-[color:var(--border-soft)] bg-[color:var(--bg-subtle)] hover:bg-[color:var(--bg-hover)] text-[color:var(--ink-main)] font-medium transition">
             ‹ 同主題上一幕
           </button>
-          <button id="btn-theme-next" type="button" class="text-sm min-h-11 px-3 py-1.5 rounded-md border border-[#D8CCB8] bg-[#FAF6EE] hover:bg-[#EFE6D5] text-[#15294A] font-medium transition">
+          <button id="btn-theme-next" type="button" class="text-sm min-h-11 px-3 py-1.5 rounded-md border border-[color:var(--border-soft)] bg-[color:var(--bg-subtle)] hover:bg-[color:var(--bg-hover)] text-[color:var(--ink-main)] font-medium transition">
             同主題下一幕 ›
           </button>
         </div>
@@ -569,7 +583,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="text-sm text-[#57606F] pt-2 pb-6 border-t border-[#E5DCCB] space-y-1.5 leading-relaxed">
+    <footer class="text-sm text-[color:var(--ink-muted)] pt-2 pb-6 border-t border-[color:var(--border-soft)] space-y-1.5 leading-relaxed">
       <p>
         <strong>年表說明：</strong>古埃及早王朝、古王國與中王國的絕對紀年學界存在些微差異，本站採用大英百科全書（Britannica）、紐約大都會藝術博物館（Met Museum）與 World History Encyclopedia 通行之主流埃及學紀年範圍，共收錄 8 大時期、17 幕代表性法老。
       </p>
@@ -580,13 +594,13 @@
   </main>
 
   <!-- Sticky Bottom Playback Control Bar -->
-  <div id="playback-bar" class="fixed bottom-0 inset-x-0 z-40 bg-[#15294A]/95 backdrop-blur-md border-t border-[#C5963B]/60 text-white shadow-lg">
+  <div id="playback-bar" class="fixed bottom-0 inset-x-0 z-40 bg-[#21150F]/95 backdrop-blur-md border-t border-[#A98055] text-white shadow-lg">
     <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2">
         <button id="btn-prev" type="button" class="w-11 h-11 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-lg font-bold transition" aria-label="上一幕">
           ‹
         </button>
-        <button id="btn-play" type="button" class="px-2.5 sm:px-4 h-11 rounded-md bg-[#C5963B] hover:bg-[#B3852E] text-[#15294A] text-base whitespace-nowrap font-bold flex items-center gap-1.5 transition shadow-sm">
+        <button id="btn-play" type="button" class="px-2.5 sm:px-4 h-11 rounded-md bg-[color:var(--gold-warm)] hover:bg-[color:var(--gold-hover)] text-[color:var(--ink-on-gold)] text-base whitespace-nowrap font-bold flex items-center gap-1.5 transition shadow-sm">
           <span id="play-icon">▶</span>
           <span id="play-label">播放</span>
         </button>
@@ -595,14 +609,14 @@
         </button>
       </div>
 
-      <div class="hidden md:flex items-center gap-2 text-xs text-slate-200 truncate">
+      <div class="hidden md:flex items-center gap-2 text-xs text-[color:var(--ink-muted)] truncate">
         <span id="bar-current-title" class="font-medium truncate"></span>
-        <span id="bar-status-msg" class="text-[#E8D5A7]"></span>
+        <span id="bar-status-msg" class="text-[color:var(--gold-warm)]"></span>
       </div>
 
       <div class="flex min-w-0 items-center gap-2">
-        <label for="playback-speed" class="sr-only sm:not-sr-only text-sm text-slate-300">模式</label>
-        <select id="playback-speed" class="bg-[#1E3A63] border border-white/20 rounded-md min-h-11 px-2 py-1.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#C5963B]">
+        <label for="playback-speed" class="sr-only sm:not-sr-only text-sm text-[color:var(--ink-muted)]">模式</label>
+        <select id="playback-speed" class="bg-[color:var(--bg-subtle)] border border-white/20 rounded-md min-h-11 px-2 py-1.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#C5963B]">
           <option value="1">1× 語音朗讀</option>
           <option value="2">2× 自動（8秒）</option>
           <option value="5">5× 快速（4秒）</option>
@@ -613,17 +627,17 @@
 
   <!-- Lightbox Modal -->
   <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/85 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="歷史插畫放大檢視">
-    <div class="max-w-4xl w-full bg-[#FAF6EE] rounded-xl overflow-hidden shadow-2xl border border-[#C5963B]">
-      <div class="flex items-center justify-between px-4 py-3 bg-[#15294A] text-white">
+    <div class="max-w-4xl w-full bg-[color:var(--bg-subtle)] rounded-xl overflow-hidden shadow-2xl border border-[color:var(--gold-warm)]">
+      <div class="flex items-center justify-between px-4 py-3 bg-[color:var(--bg-control)] text-white">
         <div id="lightbox-title" class="font-serif-display font-bold text-sm sm:text-base"></div>
         <button id="btn-close-lightbox" type="button" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs sm:text-sm">
           關閉 ✕
         </button>
       </div>
-      <div class="bg-[#111827] flex items-center justify-center max-h-[70vh] overflow-hidden">
+      <div class="bg-[color:var(--bg-paper)] flex items-center justify-center max-h-[70vh] overflow-hidden">
         <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[70vh] object-contain" />
       </div>
-      <div class="p-4 bg-[#FAF6EE] text-base text-[#374151] leading-relaxed" id="lightbox-caption"></div>
+      <div class="p-4 bg-[color:var(--bg-subtle)] text-base text-[color:var(--ink-main)] leading-relaxed" id="lightbox-caption"></div>
     </div>
   </div>
 
@@ -1898,7 +1912,7 @@
         .datum(PHARAOHS)
         .attr('d', line)
         .attr('fill', 'none')
-        .attr('stroke', '#C5963B')
+        .attr('stroke', '#ECC383')
         .attr('stroke-width', 2);
 
       svgReign.selectAll('circle')
@@ -1909,8 +1923,8 @@
         .attr('cx', (d, i) => xScale(i))
         .attr('cy', d => yScale(d.reignYears))
         .attr('r', (d, i) => i === activeIdx ? 5.5 : 3)
-        .attr('fill', (d, i) => i === activeIdx ? '#A63A2B' : '#15294A')
-        .attr('stroke', '#FFFFFF')
+        .attr('fill', (d, i) => i === activeIdx ? '#ECC383' : '#73C0B2')
+        .attr('stroke', '#271A13')
         .attr('stroke-width', (d, i) => i === activeIdx ? 2 : 1)
         .on('click', (event, d) => {
           const idx = PHARAOHS.findIndex(item => item.id === d.id);
@@ -1928,12 +1942,12 @@
       svgEra.append('line')
         .attr('x1', padX).attr('x2', w - padX)
         .attr('y1', h2 / 2).attr('y2', h2 / 2)
-        .attr('stroke', '#D8CCB8').attr('stroke-width', 3).attr('stroke-linecap', 'round');
+        .attr('stroke', '#795840').attr('stroke-width', 3).attr('stroke-linecap', 'round');
 
       svgEra.append('line')
         .attr('x1', padX).attr('x2', xBce(pActive.startBce))
         .attr('y1', h2 / 2).attr('y2', h2 / 2)
-        .attr('stroke', '#15294A').attr('stroke-width', 3).attr('stroke-linecap', 'round');
+        .attr('stroke', '#73C0B2').attr('stroke-width', 3).attr('stroke-linecap', 'round');
 
       svgEra.selectAll('circle')
         .data(PHARAOHS)
@@ -1943,8 +1957,8 @@
         .attr('cx', d => xBce(d.startBce))
         .attr('cy', h2 / 2)
         .attr('r', (d, i) => i === activeIdx ? 6 : 3.2)
-        .attr('fill', (d, i) => i === activeIdx ? '#A63A2B' : getEraById(d.eraId).color)
-        .attr('stroke', '#FFFFFF')
+        .attr('fill', (d, i) => i === activeIdx ? '#ECC383' : getEraById(d.eraId).color)
+        .attr('stroke', '#271A13')
         .attr('stroke-width', (d, i) => i === activeIdx ? 2 : 1)
         .on('click', (event, d) => {
           const idx = PHARAOHS.findIndex(item => item.id === d.id);
@@ -1960,7 +1974,7 @@
           .attr('y', h2 - 5)
           .attr('text-anchor', 'middle')
           .attr('font-size', '9')
-          .attr('fill', '#6B7280')
+          .attr('fill', '#DCC3A6')
           .text(`${yr} BCE`);
       });
     }
@@ -1986,11 +2000,11 @@
 
       // Update Toggle Buttons
       if (state.mapMode === 'start') {
-        elBtnMapStart.className = 'px-3 min-h-11 py-1 rounded font-semibold bg-[#15294A] text-white transition';
-        elBtnMapPeak.className = 'px-3 min-h-11 py-1 rounded font-medium text-[#57606F] hover:text-[#15294A] transition';
+        elBtnMapStart.className = 'px-3 min-h-11 py-1 rounded font-semibold bg-[color:var(--bg-control)] text-white transition';
+        elBtnMapPeak.className = 'px-3 min-h-11 py-1 rounded font-medium text-[color:var(--ink-muted)] hover:text-[color:var(--ink-main)] transition';
       } else {
-        elBtnMapPeak.className = 'px-3 min-h-11 py-1 rounded font-semibold bg-[#15294A] text-white transition';
-        elBtnMapStart.className = 'px-3 min-h-11 py-1 rounded font-medium text-[#57606F] hover:text-[#15294A] transition';
+        elBtnMapPeak.className = 'px-3 min-h-11 py-1 rounded font-semibold bg-[color:var(--bg-control)] text-white transition';
+        elBtnMapStart.className = 'px-3 min-h-11 py-1 rounded font-medium text-[color:var(--ink-muted)] hover:text-[color:var(--ink-main)] transition';
       }
 
       const wrap = document.getElementById('egypt-map-wrap');
@@ -2012,8 +2026,8 @@
       // Sea backdrop gradient
       const defs = svg.append('defs');
       const seaGrad = defs.append('linearGradient').attr('id', 'seaGrad').attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
-      seaGrad.append('stop').attr('offset', '0%').attr('stop-color', '#C9DFEE');
-      seaGrad.append('stop').attr('offset', '100%').attr('stop-color', '#E2EDF5');
+      seaGrad.append('stop').attr('offset', '0%').attr('stop-color', '#23413F');
+      seaGrad.append('stop').attr('offset', '100%').attr('stop-color', '#172D2E');
 
       svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'url(#seaGrad)');
 
@@ -2027,15 +2041,15 @@
           .attr('d', pathGen)
           .attr('fill', d => {
             const id = String(d.id).padStart(3, '0');
-            if (cfg.countries.includes(id)) return '#DFC07A';
-            if (cfg.influenceCountries.includes(id)) return '#EBD3B3';
-            return '#EFE8DA';
+            if (cfg.countries.includes(id)) return '#A87842';
+            if (cfg.influenceCountries.includes(id)) return '#78533C';
+            return '#49352A';
           })
           .attr('stroke', d => {
             const id = String(d.id).padStart(3, '0');
-            if (cfg.countries.includes(id)) return '#9E7524';
-            if (cfg.influenceCountries.includes(id)) return '#B86B4B';
-            return '#CFC5B3';
+            if (cfg.countries.includes(id)) return '#E5B071';
+            if (cfg.influenceCountries.includes(id)) return '#BD8F70';
+            return '#765642';
           })
           .attr('stroke-width', d => {
             const id = String(d.id).padStart(3, '0');
@@ -2047,7 +2061,7 @@
           .attr('y', 22)
           .attr('text-anchor', 'middle')
           .attr('font-size', '11')
-          .attr('fill', '#57606F')
+          .attr('fill', '#DCC3A6')
           .text('向量座標模式（底圖載入中或離線）');
       }
 
@@ -2066,7 +2080,7 @@
         .datum(nileGeo)
         .attr('d', pathGen)
         .attr('fill', 'none')
-        .attr('stroke', '#3B82A6')
+        .attr('stroke', '#73C0B2')
         .attr('stroke-width', 2.4)
         .attr('stroke-linecap', 'round')
         .attr('opacity', 0.78);
@@ -2084,7 +2098,7 @@
         arcGroup.append('path')
           .attr('d', `M${p1[0]},${p1[1]} Q${mx},${my} ${p2[0]},${p2[1]}`)
           .attr('fill', 'none')
-          .attr('stroke', '#A63A2B')
+          .attr('stroke', '#FFAD72')
           .attr('stroke-width', 2)
           .attr('stroke-dasharray', '5,3')
           .attr('opacity', 0.85);
@@ -2111,8 +2125,8 @@
 
         g.append('circle')
           .attr('r', isCapital ? 5.5 : 4.2)
-          .attr('fill', isCapital ? '#A63A2B' : '#15294A')
-          .attr('stroke', '#FFFFFF')
+          .attr('fill', isCapital ? '#FFAD72' : '#5CA799')
+          .attr('stroke', '#2C1C10')
           .attr('stroke-width', 1.6);
 
         g.append('text')
@@ -2120,14 +2134,14 @@
           .attr('y', 4)
           .attr('font-size', isCapital ? '14' : '12')
           .attr('font-weight', isCapital ? '700' : '600')
-          .attr('fill', '#15294A')
+          .attr('fill', '#F7EBDD')
           .attr('paint-order', 'stroke')
-          .attr('stroke', '#FAF6EE')
+          .attr('stroke', '#24160F')
           .attr('stroke-width', 3)
           .text(isCapital ? `★ ${site.short}` : site.short);
 
         g.on('mouseenter', () => {
-          tooltip.innerHTML = `<div class="font-bold text-[#E8D5A7]">${site.name}</div><div class="mt-0.5">${site.desc}</div>`;
+          tooltip.innerHTML = `<div class="font-bold text-[color:var(--gold-warm)]">${site.name}</div><div class="mt-0.5">${site.desc}</div>`;
           tooltip.style.opacity = '1';
           const left = Math.max(8, Math.min(width - 218, pt[0] + 12));
           const top = Math.max(8, pt[1] - 42);
@@ -2150,7 +2164,7 @@
           .attr('x', pt[0]).attr('y', pt[1])
           .attr('font-size', '10.5')
           .attr('font-style', 'italic')
-          .attr('fill', '#4A6E8A')
+          .attr('fill', '#B3D5CF')
           .attr('letter-spacing', '2')
           .text(lbl.text);
       });
@@ -2161,7 +2175,7 @@
       elThemeFilterBar.innerHTML = '';
       const allBtn = document.createElement('button');
       allBtn.type = 'button';
-      allBtn.className = `theme-pill text-sm min-h-11 px-3 py-1.5 rounded-full border border-[#D8CCB8] bg-[#FAF6EE] text-[#15294A] font-medium ${state.activeTheme === 'all' ? 'active' : ''}`;
+      allBtn.className = `theme-pill text-sm min-h-11 px-3 py-1.5 rounded-full border border-[color:var(--border-soft)] bg-[color:var(--bg-subtle)] text-[color:var(--ink-main)] font-medium ${state.activeTheme === 'all' ? 'active' : ''}`;
       allBtn.textContent = `全部 (${PHARAOHS.length})`;
       allBtn.addEventListener('click', () => {
         state.activeTheme = 'all';
@@ -2173,7 +2187,7 @@
         const count = PHARAOHS.filter(p => p.themes.includes(t.id)).length;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `theme-pill text-sm min-h-11 px-3 py-1.5 rounded-full border border-[#D8CCB8] bg-[#FAF6EE] text-[#15294A] font-medium ${state.activeTheme === t.id ? 'active' : ''}`;
+        btn.className = `theme-pill text-sm min-h-11 px-3 py-1.5 rounded-full border border-[color:var(--border-soft)] bg-[color:var(--bg-subtle)] text-[color:var(--ink-main)] font-medium ${state.activeTheme === t.id ? 'active' : ''}`;
         btn.textContent = `${t.label} (${count})`;
         btn.addEventListener('click', () => {
           state.activeTheme = t.id;
@@ -2193,18 +2207,18 @@
         card.type = 'button';
         card.className = `text-left p-3.5 rounded-lg border transition ${
           isActive
-            ? 'bg-[#15294A] text-white border-[#15294A] shadow-md'
-            : 'bg-[#FCF9F3] hover:bg-[#F3ECE0] text-[#1F2937] border-[#E5DCCB]'
+            ? 'bg-[color:var(--bg-selected)] text-white border-[color:var(--gold-warm)] shadow-md'
+            : 'bg-[color:var(--bg-control)] hover:bg-[color:var(--bg-subtle)] text-[color:var(--ink-main)] border-[color:var(--border-soft)]'
         }`;
         card.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-sm ${isActive ? 'text-[#E8D5A7]' : 'text-[#7A5415]'} font-mono font-semibold">
+          <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-sm ${isActive ? 'text-[color:var(--gold-warm)]' : 'text-[color:var(--gold-warm)]'} font-mono font-semibold">
             <span>${pad2(idx + 1)}｜${p.dynasty}</span>
             <span>${p.yearsText}</span>
           </div>
-          <div class="font-serif-display font-bold text-lg mt-1 ${isActive ? 'text-white' : 'text-[#15294A]'}">
+          <div class="font-serif-display font-bold text-lg mt-1 ${isActive ? 'text-white' : 'text-[color:var(--ink-main)]'}">
             ${p.nameZh} <span class="text-sm font-normal opacity-80">${p.nameEn}</span>
           </div>
-          <p class="text-base mt-1.5 leading-relaxed ${isActive ? 'text-slate-200' : 'text-[#57606F]'}">
+          <p class="text-base mt-1.5 leading-relaxed ${isActive ? 'text-[color:var(--ink-muted)]' : 'text-[color:var(--ink-muted)]'}">
             ${p.turningPoint}
           </p>
         `;
@@ -2275,7 +2289,7 @@
         if (!t) return;
         const tag = document.createElement('button');
         tag.type = 'button';
-        tag.className = 'text-sm min-h-11 px-2.5 py-1 rounded-full bg-[#FAF6EE] hover:bg-[#15294A] hover:text-white text-[#15294A] border border-[#D8CCB8] transition font-medium';
+        tag.className = 'text-sm min-h-11 px-2.5 py-1 rounded-full bg-[color:var(--bg-subtle)] hover:bg-[color:var(--bg-hover)] hover:text-white text-[color:var(--ink-main)] border border-[color:var(--border-soft)] transition font-medium';
         tag.textContent = `# ${t.label}`;
         tag.addEventListener('click', () => {
           state.activeTheme = tid;
@@ -2301,10 +2315,10 @@
       elMilestones.innerHTML = '';
       p.milestones.forEach(m => {
         const row = document.createElement('div');
-        row.className = 'flex flex-col sm:flex-row items-start gap-2 sm:gap-3 p-3 rounded-lg bg-[#FAF6EE] border border-[#E5DCCB]';
+        row.className = 'flex flex-col sm:flex-row items-start gap-2 sm:gap-3 p-3 rounded-lg bg-[color:var(--bg-subtle)] border border-[color:var(--border-soft)]';
         row.innerHTML = `
-          <span class="shrink-0 font-mono text-sm font-bold text-[#A63A2B] bg-white px-2 py-1 rounded border border-[#E5DCCB] min-w-[96px] text-center">${m.year}</span>
-          <p class="text-base text-[#374151] leading-relaxed">${m.text}</p>
+          <span class="shrink-0 font-mono text-sm font-bold text-[color:var(--gold-warm)] bg-[color:var(--bg-control)] px-2 py-1 rounded border border-[color:var(--border-soft)] min-w-[96px] text-center">${m.year}</span>
+          <p class="text-base text-[color:var(--ink-main)] leading-relaxed">${m.text}</p>
         `;
         elMilestones.appendChild(row);
       });
@@ -2316,7 +2330,7 @@
         a.href = lnk.url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.className = 'inline-flex items-center text-sm min-h-11 px-3 py-1.5 rounded-md bg-[#FAF6EE] hover:bg-[#15294A] hover:text-white text-[#15294A] border border-[#D8CCB8] transition font-medium';
+        a.className = 'inline-flex items-center text-sm min-h-11 px-3 py-1.5 rounded-md bg-[color:var(--bg-subtle)] hover:bg-[color:var(--bg-hover)] hover:text-white text-[color:var(--ink-main)] border border-[color:var(--border-soft)] transition font-medium';
         a.textContent = `${lnk.title} ↗`;
         elLinks.appendChild(a);
       });
